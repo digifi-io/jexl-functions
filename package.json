@@ -1,0 +1,32 @@
+{
+  "name": "@digifi/jexl-functions",
+  "version": "1.0.0",
+  "description": "Package with available JEXL functions",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digifi-io/jexl-functions.git"
+  },
+  "keywords": [
+    "jexl",
+    "digifi",
+    "functions"
+  ],
+  "author": "DigiFi Team",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/digifi-io/jexl-functions/issues"
+  },
+  "homepage": "https://github.com/digifi-io/jexl-functions#readme",
+  "dependencies": {
+    "@formulajs/formulajs": "^2.7.1"
+  }
+}
