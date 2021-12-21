@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/digifi-io/jexl-functions#readme",
   "dependencies": {
-    "@formulajs/formulajs": "^2.7.1"
+    "@formulajs/formulajs": "^2.7.1",
+    "moment": "^2.29.1"
   }
 }
