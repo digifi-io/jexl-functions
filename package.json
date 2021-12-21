@@ -29,5 +29,8 @@
   "dependencies": {
     "@formulajs/formulajs": "^2.7.1",
     "moment": "^2.29.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.4"
   }
 }
