@@ -6,6 +6,10 @@ const isDate = (value: Value): value is string => {
   return typeof value === 'string' && moment(value, moment.ISO_8601, true).isValid();
 };
 
+const isNumberInString = (value: Value): value is string => {
+  return typeof value === 'string' && !Number.isNaN(value) ;
+}
+
 const checkNullValue = (value: Value): value is null | undefined => {
   return value === null || value === undefined;
 };
@@ -13,6 +17,14 @@ const checkNullValue = (value: Value): value is null | undefined => {
 export const GT = (value: Value, compareTo: Value) => {
   if (checkNullValue(compareTo) || checkNullValue(value)) {
     return false;
+  }
+
+  if (isNumberInString(value)) {
+    value = Number.parseFloat(value);
+  }
+
+  if (isNumberInString(compareTo)) {
+    compareTo = Number.parseFloat(compareTo);
   }
 
   if (isDate(compareTo)) {
@@ -31,6 +43,14 @@ export const LT = (value: Value, compareTo: Value) => {
     return false;
   }
 
+  if (isNumberInString(value)) {
+    value = Number.parseFloat(value);
+  }
+
+  if (isNumberInString(compareTo)) {
+    compareTo = Number.parseFloat(compareTo);
+  }
+
   if (isDate(compareTo)) {
     compareTo = Date.parse(compareTo);
   }
@@ -45,6 +65,14 @@ export const LT = (value: Value, compareTo: Value) => {
 export const LTE = (value: Value, compareTo: Value) => {
   if (checkNullValue(compareTo) || checkNullValue(value)) {
     return false;
+  }
+
+  if (isNumberInString(value)) {
+    value = Number.parseFloat(value);
+  }
+
+  if (isNumberInString(compareTo)) {
+    compareTo = Number.parseFloat(compareTo);
   }
 
   if (isDate(compareTo)) {
@@ -67,6 +95,14 @@ export const GTE = (value: Value, compareTo: Value) => {
     return false;
   }
 
+  if (isNumberInString(value)) {
+    value = Number.parseFloat(value);
+  }
+
+  if (isNumberInString(compareTo)) {
+    compareTo = Number.parseFloat(compareTo);
+  }
+
   if (isDate(compareTo)) {
     compareTo = Date.parse(compareTo);
   }
@@ -85,6 +121,18 @@ export const GTE = (value: Value, compareTo: Value) => {
 export const RANGE = (value: Value, min: Value, max: Value) => {
   if (checkNullValue(min) || checkNullValue(max) || checkNullValue(value)) {
     return false;
+  }
+
+  if (isNumberInString(value)) {
+    value = Number.parseFloat(value);
+  }
+
+  if (isNumberInString(min)) {
+    min = Number.parseFloat(min);
+  }
+
+  if (isNumberInString(max)) {
+    max = Number.parseFloat(max);
   }
 
   if (isDate(min)) {
