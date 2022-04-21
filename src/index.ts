@@ -1,4 +1,5 @@
 import formulaJs from '@formulajs/formulajs';
+import * as customFunctions from './custom';
 import * as ruleFunctions from './rule';
 
 const jexlFunctions: Record<string, (...args: any[]) => any> = {
@@ -8,6 +9,7 @@ const jexlFunctions: Record<string, (...args: any[]) => any> = {
       .reduce((formulaJsFunctions, functionName) => ({ ...formulaJsFunctions, [functionName]: formulaJs[functionName] }), {})
   ),
   ...ruleFunctions,
+  ...customFunctions,
 };
 
 export default jexlFunctions;
