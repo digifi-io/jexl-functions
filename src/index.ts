@@ -1,15 +1,24 @@
-import formulaJs from '@formulajs/formulajs';
-import * as customFunctions from './custom';
-import * as ruleFunctions from './rule';
+import createArrayModule from './modules/array';
+import createDateAndTimeModule from './modules/date-and-time';
+import createLogicalModule from './modules/logical';
+import createFinancialModule from './modules/financial';
+import createStatisticModule from './modules/statistic';
+import createInformationModule from './modules/information';
+import createTextModule from './modules/text';
+import createMathAndTrigModule from './modules/math-and-trig';
+import createAddressModule from './modules/address';
+import { ExecutionError } from "@digifi/jexl";
 
-const jexlFunctions: Record<string, (...args: any[]) => any> = {
-  ...(
-    Object.keys(formulaJs)
-      .filter((functionName) => typeof formulaJs[functionName] === 'function')
-      .reduce((formulaJsFunctions, functionName) => ({ ...formulaJsFunctions, [functionName]: formulaJs[functionName] }), {})
-  ),
-  ...ruleFunctions,
-  ...customFunctions,
+const jexlFunctions = {
+  ...createArrayModule(),
+  ...createDateAndTimeModule(),
+  ...createLogicalModule(),
+  ...createFinancialModule(),
+  ...createStatisticModule(),
+  ...createInformationModule(),
+  ...createTextModule(),
+  ...createMathAndTrigModule(),
+  ...createAddressModule(),
 };
 
 export default jexlFunctions;

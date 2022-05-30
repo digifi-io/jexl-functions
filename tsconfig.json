@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["ES2020"],
+    "lib": ["ES2020", "ES2021.String"],
     "target": "es5",
     "module": "commonjs",
     "declaration": true,
@@ -8,6 +8,6 @@
     "strict": true,
     "esModuleInterop": true,
   },
-  "include": ["src", "types/formulajs.d.ts"],
+  "include": ["src", "types/jexl.d.ts"],
   "exclude": ["node_modules", "**/__tests__/*"]
 }
