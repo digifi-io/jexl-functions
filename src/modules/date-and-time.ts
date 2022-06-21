@@ -135,10 +135,10 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     return dayjs(date as ConfigType, coerceToStringWithValidation(format) || undefined).date();
   };
 
-  const DAYS = (firstDate: undefined, secondDate: unknown, format?: unknown) => {
+  const DAYS = (firstDate: unknown, secondDate: unknown, format?: unknown) => {
     const coercedFormat = coerceToStringWithValidation(format) || undefined;
 
-    return dayjs(secondDate as ConfigType, coercedFormat).diff(dayjs(firstDate as ConfigType, coercedFormat), 'days');
+    return dayjs(firstDate as ConfigType, coercedFormat).diff(dayjs(secondDate as ConfigType, coercedFormat), 'days');
   };
 
   const DATEVALUE = (date: unknown, format?: unknown) => {
@@ -146,7 +146,12 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
   };
 
   const ISOWEEKNUM = (date: unknown, format?: unknown) => {
-    return dayjs(date as ConfigType, coerceToStringWithValidation(format) || undefined).isoWeeksInYear();
+    const dateObject = dayjs(date as ConfigType, coerceToStringWithValidation(format) || undefined).startOf('date');
+    const yearStateDateObject = dayjs({ year: dateObject.year(), month: 0, day: 0 } as unknown as ConfigType);
+
+    const isoDate = dateObject.add(dateObject.date() + 4 - (dateObject.day() || 7));
+
+    return Math.ceil(((isoDate.diff(yearStateDateObject, 'milliseconds')) / 86400000 + 1) / 7);
   };
 
   const MONTH = (date: unknown, format?: unknown) => {
@@ -176,12 +181,14 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
 
     return dayjs({
       year: startDateObject.year(),
-      month: startDateObject.month() + flooredMonths,
+      month: startDateObject.month() + flooredMonths + 1,
       day: 0,
-    } as unknown as ConfigType).format(coerceToStringWithValidation(format) || undefined);
+    } as unknown as ConfigType)
+      .add(-1, 'day')
+      .format(coerceToStringWithValidation(format) || undefined);
   };
 
-  const NETWORKDAYSINTL = (startDate: unknown, endDate: unknown, weekend: unknown, holidays: unknown[] = []) => {
+  const NETWORKDAYSINTL = (startDate: unknown, endDate: unknown, weekend?: unknown, holidays: unknown[] = []) => {
     const startDateObject = dayjs(startDate as ConfigType);
     const endDateObject = dayjs(endDate as ConfigType);
     const transformedHolidays = Array.isArray(holidays) ? holidays : [holidays];
@@ -201,14 +208,15 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     const holidaysSet = generateHolidaysSet(transformedHolidays);
     const typedWeekendMask = weekendMask as string;
     const days = endDateObject.diff(startDateObject, 'days') || 1;
-    const daysModule  = Math.abs(days);
+
+    const daysModule = Math.abs(days);
     let iterationDate = dayjs(startDateObject);
 
     if (days > options.maxDaysForWorkdaysFunctions) {
       throw new Error(`Days between dates should be less than ${options.maxDaysForWorkdaysFunctions}`);
     }
 
-    let total = days;
+    let total = days < 0 ? days - 1 : days + 1;
 
     for (let i = 0; i < daysModule; i++) {
       const iterationDay = iterationDate.date();
@@ -230,7 +238,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     return total;
   };
 
-  const WORKDAYINTL = (startDate: unknown, days: unknown, weekend: unknown, holidays: unknown[]) => {
+  const WORKDAYINTL = (startDate: unknown, days: unknown, weekend?: unknown, holidays: unknown[] = []) => {
     const startDateObject = dayjs(startDate as ConfigType);
     const coercedDays = coerceToNumber(days);
     const transformedHolidays = Array.isArray(holidays) ? holidays : [holidays];
@@ -277,6 +285,39 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     return dayjs(date as ConfigType).add(coerceToNumber(months), 'months').format(coerceToStringWithValidation(format) || undefined);
   };
 
+  const DAYS360 = (startDate: unknown, endDate: unknown, method?: unknown) => {
+    const startDateObject = dayjs(startDate as ConfigType);
+    const endDateObject = dayjs(endDate as ConfigType);
+
+    const endMonth = endDateObject.month();
+    const startMonth = startDateObject.month();
+
+    if (method) {
+      const endMonth = endDateObject.month();
+      const startMonth = startDateObject.month();
+
+      const startDay = startDateObject.date() === 31 ? 30 : startDateObject.date();
+      const endDay = endDateObject.date() === 31 ? 30 : endDateObject.date()
+
+      return 360 * (endDateObject.year() - startDateObject.year()) + 30 * (endMonth - startMonth) + (endDay - startDay);
+    }
+
+    const nextMonthStartDate = dayjs({ year: startDateObject.year(), month: startMonth + 1, day: 0 } as unknown as ConfigType)
+      .add(-1, 'day');
+    const nextMonthEndDate = dayjs({ year: endDateObject.year(), month: endMonth + 1, day: 0 } as unknown as ConfigType)
+      .add(-1, 'day')
+
+    const startDay = startDateObject.date() === nextMonthStartDate.date() ? 30 : startDateObject.date();
+
+    if (endDateObject.date() === nextMonthEndDate.date()) {
+      return startDay < 30
+        ? 360 * (endDateObject.year() - startDateObject.year()) + 30 * (endMonth + 1 - startMonth) + (1 - startDay)
+        : 360 * (endDateObject.year() - startDateObject.year()) + 30 * (endMonth - startMonth) + (30 - startDay);
+    }
+
+    return 360 * (endDateObject.year() - startDateObject.year()) + 30 * (endMonth - startMonth) + (endDateObject.date() - startDay);
+  };
+
   return {
     WEEKNUM,
     YEAR,
@@ -293,6 +334,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     NETWORKDAYSINTL,
     WORKDAYINTL,
     EDATE,
+    DAYS360,
   };
 }, {
   maxDaysForWorkdaysFunctions: 3653,

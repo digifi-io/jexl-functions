@@ -1,7 +1,14 @@
 import { ExecutionError } from '@digifi/jexl';
 import { createModule } from '../utils/module';
 
-export default createModule(({ safeFlatten, coerceToNumber, validateArrayMaxSize, evalCriteriaParseResult, parseCriteriaExpression, validateCriteriaMaxLength }) => {
+export default createModule(({
+  safeFlatten,
+  coerceToNumber,
+  validateArrayMaxSize,
+  evalCriteriaParseResult,
+  parseCriteriaExpression,
+  validateCriteriaMaxLength,
+}, { defaultMaxArraySize }) => {
   const QUOTIENT = (numerator: unknown, denominator: unknown) => {
     return Math.floor(coerceToNumber(numerator) / coerceToNumber(denominator));
   };
@@ -17,7 +24,7 @@ export default createModule(({ safeFlatten, coerceToNumber, validateArrayMaxSize
   };
 
   const PRODUCT = (...args: unknown[]) => {
-    return UNFLATTENPRODUCT(safeFlatten(args));
+    return UNFLATTENPRODUCT(...safeFlatten(args));
   };
 
   const ROUNDDOWN = (value: unknown, digits: unknown) => {
@@ -308,6 +315,22 @@ export default createModule(({ safeFlatten, coerceToNumber, validateArrayMaxSize
     return Math.round(coercedValue * Math.pow(10, coercedDigits)) / Math.pow(10, coercedDigits);
   };
 
+  const BASE = (value: unknown, radix: unknown, minLength: unknown) => {
+    const coercedValue = coerceToNumber(value);
+    const coercedRadix = coerceToNumber(radix);
+    const coercedMinLength = coerceToNumber(minLength);
+
+    const valueInString = coercedValue.toString(coercedRadix);
+
+    const digitsToAdd = coercedMinLength + 1 - valueInString.length;
+
+    if (digitsToAdd > defaultMaxArraySize) {
+      throw new ExecutionError(`Min length should be less or equal than: ${coercedMinLength - 1 + valueInString.length}`);
+    }
+
+    return new Array(Math.max(coercedMinLength + 1 - valueInString.length, 0)).join('0') + valueInString;
+  };
+
   return {
     QUOTIENT,
     RADIANS,
@@ -357,5 +380,6 @@ export default createModule(({ safeFlatten, coerceToNumber, validateArrayMaxSize
     ACOT,
     ACOTH,
     ASINH,
+    BASE,
   };
 });

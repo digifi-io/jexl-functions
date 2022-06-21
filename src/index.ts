@@ -7,7 +7,6 @@ import createInformationModule from './modules/information';
 import createTextModule from './modules/text';
 import createMathAndTrigModule from './modules/math-and-trig';
 import createAddressModule from './modules/address';
-import { ExecutionError } from "@digifi/jexl";
 
 const jexlFunctions = {
   ...createArrayModule(),

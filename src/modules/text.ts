@@ -53,9 +53,9 @@ export default createModule(({ coerceToStringWithValidation, validateTextLength,
     return coerceToStringWithValidation(firstText) === coerceToStringWithValidation(secondText);
   };
 
-  const FIND = (text: unknown, valueToSearch: unknown, position: unknown = 0) => {
+  const FIND = (valueToSearch: unknown, text: unknown, position: unknown = 0) => {
     return coerceToStringWithValidation(text)
-      .indexOf(coerceToStringWithValidation(valueToSearch), coerceToNumber(position));
+      .indexOf(coerceToStringWithValidation(valueToSearch), coerceToNumber(position)) + 1;
   };
 
   const LEFT = (text: unknown, length: unknown = 1) => {
@@ -81,7 +81,8 @@ export default createModule(({ coerceToStringWithValidation, validateTextLength,
   const PROPER = (text: unknown) => {
     return coerceToStringWithValidation(text)
       .split(' ')
-      .map((word) => word.charAt(0).toUpperCase() + word.substring(1));
+      .map((word) => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+      .join(' ');
   };
 
   const REPT = (text: unknown, times: unknown) => {
@@ -94,10 +95,10 @@ export default createModule(({ coerceToStringWithValidation, validateTextLength,
     return textString.substring(textString.length - coerceToNumber(length))
   };
 
-  const SEARCH = (text: unknown, valueToSearch: unknown, position: unknown = 0) => {
+  const SEARCH = (valueToSearch: unknown, text: unknown, position: unknown = 0) => {
     return coerceToStringWithValidation(text)
       .toLowerCase()
-      .indexOf(coerceToStringWithValidation(valueToSearch).toLowerCase(), coerceToNumber(position));
+      .indexOf(coerceToStringWithValidation(valueToSearch).toLowerCase(), coerceToNumber(position)) + 1;
   };
 
   const TRIM = (text: unknown) => {

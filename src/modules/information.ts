@@ -4,7 +4,7 @@ import dayjs from '../dayjs';
 
 export default createModule(() => {
   const ISEVEN = (value: unknown) => {
-    return coerceToNumber(value) % 2;
+    return coerceToNumber(value) % 2 === 0;
   };
 
   const ISTEXT = (value: unknown): value is string => {
@@ -52,7 +52,7 @@ export default createModule(() => {
   };
 
   const ISNAN = (value: unknown) => {
-    return Number.isNaN(value);
+    return isNaN(value as unknown as number);
   };
 
   const ISDATESTRING = (value: unknown): value is string => {

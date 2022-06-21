@@ -184,7 +184,7 @@ export default createModule(({ safeFlatten, coerceToNumber }, options) => {
 
   const IPMT = (rate: unknown, period: unknown, periods: unknown, present: unknown, future: unknown, type: unknown) => {
     const coercedRate = coerceToNumber(rate);
-    const coercedPeriod = coerceToNumber(periods);
+    const coercedPeriod = coerceToNumber(period);
     const coercedPresent = coerceToNumber(present);
     const coercedType = type ? coerceToNumber(type) : 0;
 

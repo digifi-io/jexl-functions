@@ -59,12 +59,12 @@ export default createModule(({ validateArrayMaxSize }, options) => {
   const SWITCH = (value: unknown, ...args: unknown[]) => {
     validateArrayMaxSize(args, options.defaultMaxArraySize * 2);
 
-    const switchCount = args.length % 2;
-    const defaultCase = switchCount === 0 ? null : args[args.length - 1];
+    const switchCount = Math.floor(args.length / 2);
+    const defaultCase = args.length % 2 === 0 ? null : args[args.length - 1];
 
     for (let i = 0; i < switchCount; i++) {
-      if (value === args[i * 2 + 1]) {
-        return args[i * 2 + 2];
+      if (value === args[i * 2]) {
+        return args[i * 2 + 1];
       }
     }
 

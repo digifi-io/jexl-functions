@@ -1,7 +1,13 @@
 import { ExecutionError } from '@digifi/jexl';
 import { createModule } from '../utils/module';
 
-export default createModule(({ evalCriteriaParseResult, parseCriteriaExpression, validateCriteriaMaxLength, safeFlatten, coerceToNumber }) => {
+export default createModule(({
+  evalCriteriaParseResult,
+  parseCriteriaExpression,
+  validateCriteriaMaxLength,
+  safeFlatten,
+  coerceToNumber,
+}) => {
   const AVERAGE = (...args: unknown[]) => {
     const flattenArgs = safeFlatten(args);
 
@@ -15,9 +21,25 @@ export default createModule(({ evalCriteriaParseResult, parseCriteriaExpression,
   const AVERAGEA = (...args: unknown[]) => {
     const flattenArgs = safeFlatten(args);
 
-    const sum = args.reduce((previousSum: number, arg) => previousSum + coerceToNumber(arg), 0);
+    const { sum, items } = flattenArgs.reduce((previousResult: { items: number; sum: number; }, arg) => {
+      if (typeof arg === 'number' || arg === true) {
+        return {
+          sum: previousResult.sum + Number(arg),
+          items: previousResult.items + 1,
+        };
+      }
 
-    return sum / flattenArgs.length;
+      if (arg !== null) {
+        return {
+          ...previousResult,
+          items: previousResult.items + 1,
+        };
+      }
+
+      return previousResult;
+    }, { items: 0, sum: 0 });
+
+    return sum / items;
   };
 
   const AVERAGEIF = (range: unknown[], criteria: unknown, averageRange: unknown[]) => {
@@ -72,7 +94,17 @@ export default createModule(({ evalCriteriaParseResult, parseCriteriaExpression,
   };
 
   const MAXA = (...args: unknown[]) => {
-    return Math.max(...safeFlatten(args) as number[]);
+    const coercedArgs = safeFlatten(args).map((arg) => {
+      const coercedValue = coerceToNumber(arg);
+
+      if (Number.isNaN(coercedValue)) {
+        return 0;
+      }
+
+      return coercedValue;
+    });
+
+    return Math.max(...coercedArgs);
   };
 
   const MIN = (...args: unknown[]) => {
@@ -84,7 +116,17 @@ export default createModule(({ evalCriteriaParseResult, parseCriteriaExpression,
   };
 
   const MINA = (...args: unknown[]) => {
-    return Math.min(...safeFlatten(args) as number[]);
+    const coercedArgs = safeFlatten(args).map((arg) => {
+      const coercedValue = coerceToNumber(arg);
+
+      if (Number.isNaN(coercedValue)) {
+        return 0;
+      }
+
+      return coercedValue;
+    });
+
+    return Math.min(...coercedArgs);
   };
 
   const MODE = (...args: unknown[]) => {
@@ -118,7 +160,7 @@ export default createModule(({ evalCriteriaParseResult, parseCriteriaExpression,
   const LARGE = (array: unknown[], k: unknown) => {
     const numberArray = safeFlatten(array).map((item) => coerceToNumber(item));
 
-    return numberArray.sort()[coerceToNumber(k) - 1];
+    return numberArray.sort((firstItem, secondItem) => secondItem - firstItem)[coerceToNumber(k) - 1];
   };
 
   const COUNT = (...args: unknown[]) => {
@@ -133,7 +175,7 @@ export default createModule(({ evalCriteriaParseResult, parseCriteriaExpression,
     return safeFlatten(args).filter((arg) => arg === null || arg === undefined || arg === '').length;
   };
 
-  const COUNTUNIQ = (...args: unknown[]) => {
+  const COUNTUNIQUE = (...args: unknown[]) => {
     const visitedElements: Record<string, boolean> = {};
     let count = 0;
 
@@ -181,9 +223,9 @@ export default createModule(({ evalCriteriaParseResult, parseCriteriaExpression,
     COUNT,
     COUNTA,
     COUNTBLANK,
-    COUNTUNIQ,
     MEDIAN,
     AVERAGEIF,
     COUNTIF,
+    COUNTUNIQUE,
   };
 });
