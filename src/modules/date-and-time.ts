@@ -1,4 +1,5 @@
-import { ConfigType } from 'dayjs';
+import { ExecutionError } from '@digifi/jexl';
+import { ConfigType, UnitType } from 'dayjs';
 import dayjs from '../dayjs';
 import { createModule } from '../utils/module';
 
@@ -21,6 +22,12 @@ const WEEKEND_MASK_BY_NUMBER: Record<number, string> = {
 };
 
 export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStringWithValidation }, options) => {
+  const shortUnitTypeToLongUnitType: Record<string, UnitType> = {
+    'M': 'months',
+    'D': 'days',
+    'Y': 'years',
+  };
+
   const validateWeekendMask = (weekend: unknown) => {
     const weekendMaskRegex = new RegExp('^[0|1]{7}$');
 
@@ -168,7 +175,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
       .format(coerceToStringWithValidation(format) || undefined);
   };
 
-  const EOMONTH = (startDate: unknown, months: number, format?: unknown) => {
+  const EOMONTH = (startDate: unknown, months: unknown, format?: unknown) => {
     const coercedMonths = coerceToNumber(months);
 
     const flooredMonths = Math.floor(coercedMonths);
@@ -245,11 +252,11 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     const weekendMask = getWeekendMask(weekend);
 
     if (coercedDays < 0) {
-      throw new Error('Days should be more than 0');
+      throw new ExecutionError('Days should be more than 0');
     }
 
     if (coercedDays > options.maxDaysForWorkdaysFunctions) {
-      throw new Error(`Days should be less than ${options.maxDaysForWorkdaysFunctions}`);
+      throw new ExecutionError(`Days should be less than ${options.maxDaysForWorkdaysFunctions}`);
     }
 
     validateWeekendMask(weekendMask);
@@ -318,6 +325,31 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     return 360 * (endDateObject.year() - startDateObject.year()) + 30 * (endMonth - startMonth) + (endDateObject.date() - startDay);
   };
 
+  const DATEDIF = (startDate: unknown, endDate: unknown, unitType: unknown) => {
+    const startDateObject = dayjs(startDate as ConfigType);
+    const endDateObject = dayjs(endDate as ConfigType);
+    const coercedUnitType = coerceToStringWithValidation(unitType);
+
+    const longUnitType = shortUnitTypeToLongUnitType[coercedUnitType];
+
+    if (!startDateObject.isValid()) {
+      throw new ExecutionError('Start date is invalid');
+    }
+
+    if (!endDateObject.isValid()) {
+      throw new ExecutionError('End date is invalid');
+    }
+
+    if (!longUnitType) {
+      throw new ExecutionError('Unknown unit type');
+    }
+
+    return endDateObject.diff(
+      startDateObject,
+      longUnitType,
+    );
+  };
+
   return {
     WEEKNUM,
     YEAR,
@@ -335,6 +367,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     WORKDAYINTL,
     EDATE,
     DAYS360,
+    DATEDIF,
   };
 }, {
   maxDaysForWorkdaysFunctions: 3653,

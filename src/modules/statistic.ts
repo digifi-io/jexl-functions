@@ -94,17 +94,15 @@ export default createModule(({
   };
 
   const MAXA = (...args: unknown[]) => {
-    const coercedArgs = safeFlatten(args).map((arg) => {
+    const result = safeFlatten(args).reduce((maxValue: number, arg) => {
       const coercedValue = coerceToNumber(arg);
 
-      if (Number.isNaN(coercedValue)) {
-        return 0;
-      }
+      const valueForCompare = Number.isNaN(coercedValue) ? 0 : coercedValue;
 
-      return coercedValue;
-    });
+      return valueForCompare > maxValue ? valueForCompare : maxValue;
+    }, -Infinity);
 
-    return Math.max(...coercedArgs);
+    return result === -Infinity ? 0 : result;
   };
 
   const MIN = (...args: unknown[]) => {
@@ -116,17 +114,15 @@ export default createModule(({
   };
 
   const MINA = (...args: unknown[]) => {
-    const coercedArgs = safeFlatten(args).map((arg) => {
+    const result = safeFlatten(args).reduce((minValue: number, arg) => {
       const coercedValue = coerceToNumber(arg);
 
-      if (Number.isNaN(coercedValue)) {
-        return 0;
-      }
+      const valueForCompare = Number.isNaN(coercedValue) ? 0 : coercedValue;
 
-      return coercedValue;
-    });
+      return minValue > valueForCompare ? valueForCompare : minValue;
+    }, Infinity);
 
-    return Math.min(...coercedArgs);
+    return result === Infinity ? 0 : result;
   };
 
   const MODE = (...args: unknown[]) => {
@@ -193,6 +189,8 @@ export default createModule(({
         visitedElements[identifier] = true;
       }
     }
+
+    return count;
   };
 
   const MEDIAN = (...args: unknown[]) => {

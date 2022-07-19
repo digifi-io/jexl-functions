@@ -131,5 +131,6 @@ export default createModule(({ coerceToStringWithValidation, validateTextLength,
     VALUE,
     REPLACE,
     SUBSTITUTE,
+    CONCATENATE: CONCAT,
   };
 });
