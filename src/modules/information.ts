@@ -35,12 +35,16 @@ export default createModule(() => {
     return !ISUNDEFINED(value);
   }
 
-  const ISEMPTY = (value: unknown): value is null | undefined => {
+  const ISEMPTY = (value: unknown, checkForEmptyString?: unknown) => {
+    if (checkForEmptyString == true && value === '') {
+      return true;
+    }
+
     return value === null || value === undefined;
   };
 
-  const ISNOTEMPTY = (value: unknown) => {
-    return !ISEMPTY(value);
+  const ISNOTEMPTY = (value: unknown, checkForEmptyString?: boolean) => {
+    return !ISEMPTY(value, checkForEmptyString);
   };
 
   const ISNUMBER = (value: unknown): value is number => {
