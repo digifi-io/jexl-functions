@@ -7,6 +7,10 @@ export const coerceToString = (value: unknown) => {
 };
 
 export const coerceToNumber = (value: unknown) => {
+  if (value === null || value === undefined || value === '') {
+    return 0;
+  }
+
   if (typeof value === 'string') {
     return Number.parseFloat(value);
   }
