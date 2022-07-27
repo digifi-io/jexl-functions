@@ -9,13 +9,23 @@ export default createModule(({ validateArrayMaxSize }, options) => {
   const AND = (...args: unknown[]) => {
     validateArrayMaxSize(args);
 
-    return args.every((arg) => !!arg);
+    // Filter args to keep previous functions working
+    const filteredArgs = args.filter((arg) => {
+      return arg !== null && arg !== undefined && typeof arg !== 'string';
+    });
+
+    return filteredArgs.every((arg) => !!arg);
   };
 
   const OR = (...args: unknown[]) => {
     validateArrayMaxSize(args);
 
-    return args.some((arg) => !!arg);
+    // Filter args to keep previous functions working
+    const filteredArgs = args.filter((arg) => {
+      return arg !== null && arg !== undefined && typeof arg !== 'string';
+    });
+
+    return filteredArgs.some((arg) => !!arg);
   };
 
   const XOR = (...args: unknown[]) => {
@@ -28,7 +38,21 @@ export default createModule(({ validateArrayMaxSize }, options) => {
     return !!(Math.floor(Math.abs(passedCount)) & 1);
   };
 
-  const IF = (condition: unknown, thenValue: unknown, elseValue: unknown) => {
+  const IF = (condition: unknown, ...values: unknown[]) => {
+    let [thenValue, elseValue] = values;
+
+    // Keep it to do not break previous functions
+    thenValue = values.length >= 1 ? thenValue : true;
+    elseValue = values.length === 2 ? elseValue : false;
+
+    if (thenValue === undefined || thenValue === null) {
+      thenValue = 0;
+    }
+
+    if (elseValue === undefined || elseValue === null) {
+      elseValue = 0;
+    }
+
     return condition ? thenValue : elseValue;
   };
 
