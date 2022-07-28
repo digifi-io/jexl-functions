@@ -333,15 +333,15 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     const longUnitType = shortUnitTypeToLongUnitType[coercedUnitType];
 
     if (!startDateObject.isValid()) {
-      throw new ExecutionError('Start date is invalid');
+      return NaN;
     }
 
     if (!endDateObject.isValid()) {
-      throw new ExecutionError('End date is invalid');
+      return NaN;
     }
 
     if (!longUnitType) {
-      throw new ExecutionError('Unknown unit type');
+      return NaN;
     }
 
     return endDateObject.diff(
