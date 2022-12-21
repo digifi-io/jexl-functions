@@ -67,6 +67,14 @@ export default createModule(() => {
     return value === '';
   };
 
+  const ISEMPTYORBLANK = (value: unknown): value is string | null | undefined => {
+    return value === '' || value === null || value === undefined;
+  };
+
+  const ISNOTEMPTYORBLANK = (value: unknown) => {
+    return !ISEMPTYORBLANK(value);
+  };
+
   return {
     ISEVEN,
     ISTEXT,
@@ -83,5 +91,7 @@ export default createModule(() => {
     ISNAN,
     ISDATESTRING,
     ISBLANK,
+    ISEMPTYORBLANK,
+    ISNOTEMPTYORBLANK,
   };
 });
