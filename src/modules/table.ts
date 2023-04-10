@@ -3,6 +3,7 @@ import { ExecutionError } from '@digifi/jexl';
 import { ICriteriaParseResult } from '../utils/criteria';
 
 const MAX_CRITERIA_COUNT = 30;
+const MAX_TABLE_ARRAY_LENGTH = 100;
 
 type ParsedCriteriaResult = {
   parsedCriteria: ICriteriaParseResult;
@@ -39,6 +40,18 @@ export default createModule(({
     }, 0);
   };
 
+  const TABLESUMIFSOR = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
+    validateTableData(table, columnName);
+
+    const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
+
+    return (table as []).reduce((sum: number, tableRow: Record<string, unknown>) => {
+      const evaluationResult = parsedCriteriaData.some(({ parsedCriteria, criteriaColumn }, index) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
+
+      return sum + (evaluationResult ? coerceToNumber(tableRow[columnName]) : 0)
+    }, 0);
+  };
+
   const TABLECOUNT = (table: unknown, columnName: string) => {
     validateTableData(table, columnName);
 
@@ -63,6 +76,18 @@ export default createModule(({
     }, 0);
   };
 
+  const TABLECOUNTIFSOR = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
+    validateTableData(table, columnName);
+
+    const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
+
+    return (table as []).reduce((count: number, tableRow: Record<string, unknown>) => {
+      const evaluationResult = parsedCriteriaData.some(({ parsedCriteria, criteriaColumn }, index) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
+
+      return count + (evaluationResult && tableRow[columnName] !== undefined && tableRow[columnName] !== null ? 1 : 0);
+    }, 0);
+  };
+
   const TABLEMAX = (table: unknown, columnName: string) => {
     validateTableData(table, columnName);
 
@@ -78,7 +103,15 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return Math.max(...extractValidNumbersFromTableWithCriteria(table as [], columnName, parsedCriteriaData));
+    return Math.max(...extractValidNumbersFromTableWithAllPassingCriteria(table as [], columnName, parsedCriteriaData));
+  };
+
+  const TABLEMAXIFSOR = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
+    validateTableData(table, columnName);
+
+    const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
+
+    return Math.max(...extractValidNumbersFromTableWithSomePassingCriteria(table as [], columnName, parsedCriteriaData));
   };
 
   const TABLEMIN = (table: unknown, columnName: string) => {
@@ -96,7 +129,31 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return Math.min(...extractValidNumbersFromTableWithCriteria(table as [], columnName, parsedCriteriaData));
+    return Math.min(...extractValidNumbersFromTableWithAllPassingCriteria(table as [], columnName, parsedCriteriaData));
+  };
+
+  const TABLEMINIFSOR = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
+    validateTableData(table, columnName);
+
+    const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
+
+    return Math.min(...extractValidNumbersFromTableWithSomePassingCriteria(table as [], columnName, parsedCriteriaData));
+  };
+
+  const TABLEAVG = (table: unknown, columnName: unknown) => {
+    return TABLESUM(table, columnName) / TABLECOUNT(table, columnName as string);
+  };
+
+  const TABLEAVGIF = (table: unknown, columnName: string, criteriaColumn: unknown, criteria: unknown) => {
+    return TABLEAVGIFS(table, columnName, criteriaColumn, criteria);
+  };
+
+  const TABLEAVGIFS = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
+    return TABLESUMIFS(table, columnName,...criteriaData) / TABLECOUNTIFS(table, columnName, ...criteriaData);
+  };
+
+  const TABLEAVGIFSOR = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
+    return TABLESUMIFSOR(table, columnName,...criteriaData) / TABLECOUNTIFSOR(table, columnName, ...criteriaData);
   };
 
   const getParsedMultipleCriteriaResult = (criteriaData: unknown[]) => {
@@ -116,12 +173,14 @@ export default createModule(({
 
       return accumulator;
     }, [] as ParsedCriteriaResult[]);
-  }
+  };
 
   const validateTableData = (table: unknown, column: unknown) => {
     if (!table || !Array.isArray(table)) {
       throw new ExecutionError('Table variable should be an array.');
     }
+
+    validateArrayMaxSize(table, MAX_TABLE_ARRAY_LENGTH);
 
     if (typeof column !== 'string') {
       throw new ExecutionError('Column name should be a string.');
@@ -168,9 +227,9 @@ export default createModule(({
       }, [] as number[])
   };
 
-  const extractValidNumbersFromTableWithCriteria = (table: unknown[], columnName: string, parsedCriteriaData: ParsedCriteriaResult[]) => {
+  const extractValidNumbersFromTableWithAllPassingCriteria = (table: unknown[], columnName: string, parsedCriteriaData: ParsedCriteriaResult[]) => {
     return (table as []).reduce((accumulator: number[], tableRow: Record<string, unknown>) => {
-        if(tableRow[columnName] === undefined || tableRow[columnName] === null) {
+        if (tableRow[columnName] === undefined || tableRow[columnName] === null) {
           return accumulator;
         }
 
@@ -184,20 +243,46 @@ export default createModule(({
 
         return accumulator;
       }, [] as number[])
-  }
+  };
+
+  const extractValidNumbersFromTableWithSomePassingCriteria = (table: unknown[], columnName: string, parsedCriteriaData: ParsedCriteriaResult[]) => {
+    return (table as []).reduce((accumulator: number[], tableRow: Record<string, unknown>) => {
+      if (tableRow[columnName] === undefined || tableRow[columnName] === null) {
+        return accumulator;
+      }
+
+      const evaluationResult = parsedCriteriaData.some(
+        ({ parsedCriteria, criteriaColumn }, index) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string])
+      );
+
+      if (evaluationResult) {
+        accumulator.push(coerceToNumber(tableRow[columnName]));
+      }
+
+      return accumulator;
+    }, [] as number[])
+  };
 
   return {
     TABLESUM,
     TABLESUMIF,
     TABLESUMIFS,
+    TABLESUMIFSOR,
     TABLECOUNT,
     TABLECOUNTIF,
     TABLECOUNTIFS,
+    TABLECOUNTIFSOR,
     TABLEMAX,
     TABLEMAXIF,
     TABLEMAXIFS,
+    TABLEMAXIFSOR,
     TABLEMIN,
     TABLEMINIF,
     TABLEMINIFS,
+    TABLEMINIFSOR,
+    TABLEAVG,
+    TABLEAVGIF,
+    TABLEAVGIFS,
+    TABLEAVGIFSOR,
   };
 });
