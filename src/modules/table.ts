@@ -17,7 +17,7 @@ export default createModule(({
   parseCriteriaExpression,
 }) => {
   const TABLESUM = (table: unknown, columnName: unknown) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     return (table as []).reduce((sum: number, tableRow: Record<string, unknown>) => {
       return sum + coerceToNumber(tableRow[columnName as string]);
@@ -29,7 +29,7 @@ export default createModule(({
   };
 
   const TABLESUMIFS = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
@@ -41,7 +41,7 @@ export default createModule(({
   };
 
   const TABLESUMIFSOR = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
@@ -53,7 +53,7 @@ export default createModule(({
   };
 
   const TABLECOUNT = (table: unknown, columnName: string) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     return (table as []).reduce((count: number, tableRow: Record<string, unknown>) => {
       return count + (tableRow[columnName] !== undefined && tableRow[columnName] !== null ? 1 : 0);
@@ -65,7 +65,7 @@ export default createModule(({
   };
 
   const TABLECOUNTIFS = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
@@ -77,7 +77,7 @@ export default createModule(({
   };
 
   const TABLECOUNTIFSOR = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
@@ -89,7 +89,7 @@ export default createModule(({
   };
 
   const TABLEMAX = (table: unknown, columnName: string) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     return Math.max(...extractValidNumbersFromTable(table as [], columnName));
   };
@@ -99,7 +99,7 @@ export default createModule(({
   };
 
   const TABLEMAXIFS = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
@@ -107,7 +107,7 @@ export default createModule(({
   };
 
   const TABLEMAXIFSOR = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
@@ -115,7 +115,7 @@ export default createModule(({
   };
 
   const TABLEMIN = (table: unknown, columnName: string) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     return Math.min(...extractValidNumbersFromTable(table as [], columnName));
   };
@@ -125,7 +125,7 @@ export default createModule(({
   };
 
   const TABLEMINIFS = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
@@ -133,7 +133,7 @@ export default createModule(({
   };
 
   const TABLEMINIFSOR = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
-    validateTableData(table, columnName);
+    validateTableAndColumnData(table, columnName);
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
@@ -156,6 +156,58 @@ export default createModule(({
     return TABLESUMIFSOR(table, columnName,...criteriaData) / TABLECOUNTIFSOR(table, columnName, ...criteriaData);
   };
 
+  const TABLEFILTERROWSIF = (table: unknown, criteriaColumn: unknown, criteria: unknown) => {
+    return TABLEFILTERROWSIFS(table, criteriaColumn, criteria);
+  }
+
+  const TABLEFILTERROWSIFS = (table: unknown, ...criteriaData: unknown[]) => {
+    validateTableData(table);
+
+    const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
+
+    return (table as []).filter((tableRow: Record<string, unknown>) =>
+      parsedCriteriaData.every(({ parsedCriteria, criteriaColumn }) =>
+        evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string])
+      )
+    );
+  }
+
+  const TABLEFILTERROWSIFSOR = (table: unknown, ...criteriaData: unknown[]) => {
+    validateTableData(table);
+
+    const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
+
+    return (table as []).filter((tableRow: Record<string, unknown>) =>
+      parsedCriteriaData.some(({ parsedCriteria, criteriaColumn }) =>
+        evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string])
+      )
+    );
+  }
+
+  const TABLEMATCHESCONDITIONS = (table: unknown, ...criteriaData: unknown[]) => {
+    validateTableData(table);
+
+    const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
+
+    return (table as []).every((tableRow: Record<string, unknown>) =>
+      parsedCriteriaData.every(({ parsedCriteria, criteriaColumn }) =>
+        evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string])
+      )
+    );
+  }
+
+  const TABLECONTCATROWS = (table: unknown, rowsToAdd: unknown) => {
+    validateTableData(table);
+
+    validateRowsToAddData(rowsToAdd, table);
+
+    const combinedTable = (table as []).concat(rowsToAdd as []);
+
+    validateArrayMaxSize(combinedTable, MAX_TABLE_ARRAY_LENGTH);
+
+    return combinedTable;
+  }
+
   const getParsedMultipleCriteriaResult = (criteriaData: unknown[]) => {
     validateMultipleCriteriaData(criteriaData);
 
@@ -175,13 +227,15 @@ export default createModule(({
     }, [] as ParsedCriteriaResult[]);
   };
 
-  const validateTableData = (table: unknown, column: unknown) => {
+  const validateTableData = (table: unknown, message = 'Table variable should be an array.') => {
     if (!table || !Array.isArray(table)) {
-      throw new ExecutionError('Table variable should be an array.');
+      throw new ExecutionError(message);
     }
 
     validateArrayMaxSize(table, MAX_TABLE_ARRAY_LENGTH);
+  };
 
+  const validateColumnData = (column: unknown) => {
     if (typeof column !== 'string') {
       throw new ExecutionError('Column name should be a string.');
     }
@@ -190,6 +244,46 @@ export default createModule(({
       throw new ExecutionError('Column name cannot be empty.')
     }
   };
+
+  const validateTableAndColumnData = (table: unknown, column: unknown) => {
+    validateTableData(table);
+
+    validateColumnData(column);
+  };
+
+  const getTableColumnNames = (table: []) => table.reduce(
+    (columnNames, row) => {
+      Object.keys(row).map((columnName) => columnNames.add(columnName));
+
+      return columnNames;
+    },
+    new Set()
+  )
+
+  const validateRowsToAddData = (rowsToAdd: unknown, originalTable: unknown) => {
+    validateTableData(rowsToAdd, 'Added rows should be an array.');
+
+    if ((rowsToAdd as []).some((row: Record<string, unknown>) => !(typeof row === 'object' && row !== null))) {
+      throw new ExecutionError('Added rows should be objects.');
+    }
+
+    const originalColumnNames = getTableColumnNames(originalTable as []);
+    const originalColumnNamesArray = [...originalColumnNames];
+    const addedRowsColumnNames = getTableColumnNames(rowsToAdd as []);
+
+    if (
+      originalColumnNames.size !== addedRowsColumnNames.size ||
+      originalColumnNamesArray.some((originalColumnName) => !addedRowsColumnNames.has(originalColumnName))
+    ) {
+      const missingColumns = originalColumnNamesArray.filter((originalColumnName) => !addedRowsColumnNames.has(originalColumnName));
+      const errorMessage =
+        missingColumns.length > 0
+          ? `Added rows miss the following columns from the original table: ${missingColumns.join(', ')}.`
+          : 'Added rows should have the same number of columns as the original table.';
+
+      throw new ExecutionError(errorMessage);
+    }
+  }
 
   const validateCriteriaData = (criteriaColumn: unknown, criteria: unknown) => {
     if (typeof criteriaColumn !== 'string') {
@@ -284,5 +378,10 @@ export default createModule(({
     TABLEAVGIF,
     TABLEAVGIFS,
     TABLEAVGIFSOR,
+    TABLEFILTERROWSIF,
+    TABLEFILTERROWSIFS,
+    TABLEFILTERROWSIFSOR,
+    TABLEMATCHESCONDITIONS,
+    TABLECONTCATROWS,
   };
 });
