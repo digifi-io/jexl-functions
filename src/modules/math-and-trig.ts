@@ -1,5 +1,6 @@
 import { ExecutionError } from '@digifi/jexl';
 import { createModule } from '../utils/module';
+import { ICriteria } from '../utils/criteria';
 
 export default createModule(({
   safeFlatten,
@@ -7,7 +8,7 @@ export default createModule(({
   validateArrayMaxSize,
   evalCriteriaParseResult,
   parseCriteriaExpression,
-  validateCriteriaMaxLength,
+  validateCriteria,
 }, { defaultMaxArraySize }) => {
   const QUOTIENT = (numerator: unknown, denominator: unknown) => {
     return Math.floor(coerceToNumber(numerator) / coerceToNumber(denominator));
@@ -154,13 +155,9 @@ export default createModule(({
     const flattenRange = safeFlatten(range);
     const flattenSumRange = sumRange ? safeFlatten(sumRange) : flattenRange;
 
-    if (typeof criteria !== 'string') {
-      throw new ExecutionError('Criteria should be a string.');
-    }
+    validateCriteria(criteria);
 
-    validateCriteriaMaxLength(criteria);
-
-    const parseResult = parseCriteriaExpression(criteria);
+    const parseResult = parseCriteriaExpression(criteria as ICriteria);
 
     return flattenRange.reduce((result: number, valueInRange, index) => {
       const evaluationResult = evalCriteriaParseResult(parseResult, valueInRange);

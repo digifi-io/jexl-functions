@@ -1,10 +1,10 @@
-import { ExecutionError } from '@digifi/jexl';
 import { createModule } from '../utils/module';
+import { ICriteria } from '../utils/criteria';
 
 export default createModule(({
   evalCriteriaParseResult,
   parseCriteriaExpression,
-  validateCriteriaMaxLength,
+  validateCriteria,
   safeFlatten,
   coerceToNumber,
 }) => {
@@ -46,13 +46,9 @@ export default createModule(({
     const flattenRange = safeFlatten(range);
     const flattenAverageRange = averageRange ? safeFlatten(averageRange) : flattenRange;
 
-    if (typeof criteria !== 'string') {
-      throw new ExecutionError('Criteria should be a string.');
-    }
+    validateCriteria(criteria);
 
-    validateCriteriaMaxLength(criteria);
-
-    const parseResult = parseCriteriaExpression(criteria);
+    const parseResult = parseCriteriaExpression(criteria as ICriteria);
 
     const { count, result } = flattenRange.reduce((data: { count: number; result: number; }, valueInRange, index) => {
       const evaluationResult = evalCriteriaParseResult(parseResult, valueInRange);
@@ -68,13 +64,9 @@ export default createModule(({
   const COUNTIF = (range: unknown[], criteria: unknown) => {
     const flattenRange = safeFlatten(range);
 
-    if (typeof criteria !== 'string') {
-      throw new ExecutionError('Criteria should be a string.');
-    }
+    validateCriteria(criteria);
 
-    validateCriteriaMaxLength(criteria);
-
-    const parseResult = parseCriteriaExpression(criteria);
+    const parseResult = parseCriteriaExpression(criteria as ICriteria);
 
     return flattenRange.reduce((previousCount: number, valueInRange) => {
       const evaluationResult = evalCriteriaParseResult(parseResult, valueInRange);
