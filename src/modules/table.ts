@@ -34,7 +34,7 @@ export default createModule(({
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
     return (table as []).reduce((sum: number, tableRow: Record<string, unknown>) => {
-      const evaluationResult = parsedCriteriaData.every(({ parsedCriteria, criteriaColumn }, index) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
+      const evaluationResult = parsedCriteriaData.every(({ parsedCriteria, criteriaColumn }) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
 
       return sum + (evaluationResult ? coerceToNumber(tableRow[columnName]) : 0)
     }, 0);
@@ -46,7 +46,7 @@ export default createModule(({
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
     return (table as []).reduce((sum: number, tableRow: Record<string, unknown>) => {
-      const evaluationResult = parsedCriteriaData.some(({ parsedCriteria, criteriaColumn }, index) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
+      const evaluationResult = parsedCriteriaData.some(({ parsedCriteria, criteriaColumn }) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
 
       return sum + (evaluationResult ? coerceToNumber(tableRow[columnName]) : 0)
     }, 0);
@@ -70,7 +70,7 @@ export default createModule(({
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
     return (table as []).reduce((count: number, tableRow: Record<string, unknown>) => {
-      const evaluationResult = parsedCriteriaData.every(({ parsedCriteria, criteriaColumn }, index) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
+      const evaluationResult = parsedCriteriaData.every(({ parsedCriteria, criteriaColumn }) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
 
       return count + (evaluationResult && tableRow[columnName] !== undefined && tableRow[columnName] !== null ? 1 : 0);
     }, 0);
@@ -82,7 +82,7 @@ export default createModule(({
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
     return (table as []).reduce((count: number, tableRow: Record<string, unknown>) => {
-      const evaluationResult = parsedCriteriaData.some(({ parsedCriteria, criteriaColumn }, index) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
+      const evaluationResult = parsedCriteriaData.some(({ parsedCriteria, criteriaColumn }) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
 
       return count + (evaluationResult && tableRow[columnName] !== undefined && tableRow[columnName] !== null ? 1 : 0);
     }, 0);
@@ -328,7 +328,7 @@ export default createModule(({
         }
 
         const evaluationResult = parsedCriteriaData.every(
-          ({ parsedCriteria, criteriaColumn }, index) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string])
+          ({ parsedCriteria, criteriaColumn }) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string])
         );
 
         if (evaluationResult) {
@@ -346,7 +346,7 @@ export default createModule(({
       }
 
       const evaluationResult = parsedCriteriaData.some(
-        ({ parsedCriteria, criteriaColumn }, index) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string])
+        ({ parsedCriteria, criteriaColumn }) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string])
       );
 
       if (evaluationResult) {

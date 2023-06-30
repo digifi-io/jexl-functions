@@ -1,4 +1,8 @@
-import { createValidateTextLengthFunction, createValidateArrayMaxSizeFunction } from './validation';
+import {
+  createValidateTextLengthFunction,
+  createValidateArrayMaxSizeFunction,
+  createValidateCriteria,
+} from './validation';
 import { createSaveFlattenFunction } from './array';
 import { evalCriteriaParseResult, parseCriteriaExpression } from './criteria';
 import { coerceToString, coerceToNumber } from './coerceUtils';
@@ -7,7 +11,7 @@ export interface ModuleUtils {
   validateTextLength: ReturnType<typeof createValidateTextLengthFunction>;
   validateArrayMaxSize: ReturnType<typeof createValidateArrayMaxSizeFunction>;
   safeFlatten: ReturnType<typeof createSaveFlattenFunction>;
-  validateCriteriaMaxLength: ReturnType<typeof createValidateTextLengthFunction>;
+  validateCriteria: ReturnType<typeof createValidateCriteria>;
   evalCriteriaParseResult: typeof evalCriteriaParseResult;
   parseCriteriaExpression: typeof parseCriteriaExpression;
   coerceToNumber: typeof coerceToNumber;
@@ -50,7 +54,7 @@ export function createModule<ReturnType>(
     const validateTextLength = createValidateTextLengthFunction(currentOptions.defaultMaxTextLength);
     const validateArrayMaxSize = createValidateArrayMaxSizeFunction(currentOptions.defaultMaxArraySize);
     const safeFlatten = createSaveFlattenFunction(currentOptions.defaultMaxArraySize);
-    const validateCriteriaMaxLength = createValidateTextLengthFunction(currentOptions.defaultMaxCriteriaLength);
+    const validateCriteria = createValidateCriteria(currentOptions.defaultMaxCriteriaLength);
 
     const coerceToStringWithValidation = (text: unknown, maxTextLengthOverride?: number) => {
       const coercedValue = coerceToString(text);
@@ -64,7 +68,7 @@ export function createModule<ReturnType>(
       validateTextLength,
       validateArrayMaxSize,
       safeFlatten,
-      validateCriteriaMaxLength,
+      validateCriteria,
       coerceToStringWithValidation,
       evalCriteriaParseResult,
       parseCriteriaExpression,

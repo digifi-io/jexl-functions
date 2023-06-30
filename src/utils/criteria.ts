@@ -2,13 +2,17 @@
 import { NotEmptyValue } from '../../types';
 
 const CRITERIA_OPERATORS = ['>=', '<=', '<>', '=', '>', '<'];
+export const CRITERIA_OPERATORS_SET = new Set(CRITERIA_OPERATORS);
 const DEFAULT_OPERATION = '=';
 const SPLIT_REGEX = new RegExp(`^(${CRITERIA_OPERATORS.join('|')})`);
 const SYSTEM_CRITERIA = ['#TRUE', '#FALSE', '#UNDEFINED', '#NULL', '#EMPTY', '#NOT_EMPTY', '#BLANK', '#NOT_BLANK'];
 
+export type ICriteria = string | [string, unknown];
+
 export interface IOperationParseResult {
   operator: string;
-  rightOperand: string | number;
+  rightOperand: unknown;
+  disableCoercing?: boolean;
 }
 
 export interface ISystemCriteriaParseResult {
@@ -25,30 +29,40 @@ const isSystemCriteriaParseResult = (result: ICriteriaParseResult): result is IS
   return !!(result as ISystemCriteriaParseResult).systemCriteria;
 };
 
-const coerceOperand = (operand: string) => {
+const coerceOperandToNumber = (operand: unknown) => {
   const coerced = Number(operand);
 
   return Number.isNaN(coerced) ? operand : coerced;
 };
 
-export const parseCriteriaExpression = (expression: string): ICriteriaParseResult => {
-  if (isSystemCriteria(expression)) {
+export const parseCriteriaExpression = (criteria: ICriteria): ICriteriaParseResult => {
+  if (Array.isArray(criteria)) {
+    const [operator, rightOperand] = criteria;
+
     return {
-      systemCriteria: expression,
+      operator,
+      rightOperand,
+      disableCoercing: true,
+    }
+  }
+
+  if (isSystemCriteria(criteria)) {
+    return {
+      systemCriteria: criteria as string,
     };
   }
 
-  const tokens = expression
+  const tokens = criteria
     .split(SPLIT_REGEX)
     .filter((token) => !!token);
 
   const [operation = '', operand = ''] = tokens;
 
-  const isOperationExists = CRITERIA_OPERATORS.includes(operation);
+  const isOperationExists = CRITERIA_OPERATORS_SET.has(operation);
 
   return {
     operator: isOperationExists ? operation : DEFAULT_OPERATION,
-    rightOperand: coerceOperand(isOperationExists ? operand.trimStart() : expression.trimStart()),
+    rightOperand: isOperationExists ? operand.trimStart() : criteria.trimStart(),
   };
 };
 
@@ -57,29 +71,33 @@ const evalOperationParseResult = (parseResult: IOperationParseResult, leftOperan
     return false;
   }
 
+  const coercedRightOperand = (parseResult.disableCoercing || typeof leftOperand !== 'number'
+    ? parseResult.rightOperand
+    : coerceOperandToNumber(parseResult.rightOperand)) as NotEmptyValue;
+
   const typedLeftOperand = leftOperand as NotEmptyValue;
 
   switch (parseResult.operator) {
     case '>=': {
-      return typedLeftOperand >= parseResult.rightOperand;
+      return typedLeftOperand >= coercedRightOperand;
     }
     case '<=': {
-      return typedLeftOperand <= parseResult.rightOperand;
+      return typedLeftOperand <= coercedRightOperand;
     }
     case '<>': {
-      return leftOperand !== parseResult.rightOperand;
+      return leftOperand !== coercedRightOperand;
     }
     case '=': {
-      return leftOperand === parseResult.rightOperand;
+      return leftOperand === coercedRightOperand;
     }
     case '>': {
-      return typedLeftOperand > parseResult.rightOperand;
+      return typedLeftOperand > coercedRightOperand;
     }
     case '<': {
-      return typedLeftOperand < parseResult.rightOperand;
+      return typedLeftOperand < coercedRightOperand;
     }
     default: {
-      return leftOperand === parseResult.rightOperand;
+      return leftOperand === coercedRightOperand;
     }
   }
 }
