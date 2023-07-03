@@ -13,6 +13,8 @@ type ParsedCriteriaResult = {
 export default createModule(({
   coerceToNumber,
   validateArrayMaxSize,
+  validateTextLength,
+  validateCriteria,
   evalCriteriaParseResult,
   parseCriteriaExpression,
 }) => {
@@ -294,9 +296,8 @@ export default createModule(({
       throw new ExecutionError('Criteria column name cannot be empty.');
     }
 
-    if (typeof criteria !== 'string') {
-      throw new ExecutionError('Criteria should be a string.');
-    }
+    validateTextLength(criteriaColumn);
+    validateCriteria(criteria);
   };
 
   const validateMultipleCriteriaData = (criteriaData: unknown[]) => {
