@@ -2,14 +2,14 @@ import { coerceToNumber } from '../utils/coerceUtils';
 import { createModule } from '../utils/module';
 import dayjs from '../dayjs';
 
-export default createModule(() => {
+export default createModule(({ coerceToStringWithValidation }) => {
   const ISEVEN = (value: unknown) => {
     return coerceToNumber(value) % 2 === 0;
   };
 
   const ISTEXT = (value: unknown): value is string => {
     return typeof value === 'string';
-  }
+  };
 
   const ISNONTEXT = (value: unknown) => {
     return !ISTEXT(value);
@@ -33,7 +33,7 @@ export default createModule(() => {
 
   const ISNOTUNDEFINED = (value: unknown) => {
     return !ISUNDEFINED(value);
-  }
+  };
 
   const ISEMPTY = (value: unknown, checkForEmptyString?: unknown) => {
     if (checkForEmptyString == true && value === '') {
@@ -59,8 +59,11 @@ export default createModule(() => {
     return isNaN(value as unknown as number);
   };
 
-  const ISDATESTRING = (value: unknown): value is string => {
-    return typeof value === 'string' && dayjs(value, 'YYYY-MM-DD', true).isValid();
+  const ISDATESTRING = (value: unknown, format?: unknown): value is string => {
+    return (
+      typeof value === 'string' &&
+      dayjs(value, coerceToStringWithValidation(format) || undefined, true).isValid()
+    );
   };
 
   const ISBLANK = (value: unknown): value is string => {
