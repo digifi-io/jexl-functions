@@ -1,4 +1,4 @@
-import { ExecutionError } from '@digifi/jexl';
+import { JexlFunctionExecutionError } from '../errors';
 import { createModule } from '../utils/module';
 import { ICriteria } from '../utils/criteria';
 
@@ -322,7 +322,7 @@ export default createModule(({
     const digitsToAdd = coercedMinLength + 1 - valueInString.length;
 
     if (digitsToAdd > defaultMaxArraySize) {
-      throw new ExecutionError(`Min length should be less or equal than: ${coercedMinLength - 1 + valueInString.length}`);
+      throw new JexlFunctionExecutionError(`Min length should be less or equal than: ${coercedMinLength - 1 + valueInString.length}`);
     }
 
     return new Array(Math.max(coercedMinLength + 1 - valueInString.length, 0)).join('0') + valueInString;

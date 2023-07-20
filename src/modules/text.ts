@@ -1,18 +1,18 @@
-import { ExecutionError } from '@digifi/jexl';
+import { JexlFunctionExecutionError } from '../errors';
 import { createModule } from '../utils/module';
 
 export default createModule(({ coerceToStringWithValidation, validateTextLength, coerceToNumber, validateArrayMaxSize }) => {
   const SUBSTITUTE = (text: unknown, textToReplace: unknown, replacement: unknown) => {
     if (typeof text !== 'string') {
-      throw new ExecutionError('Text argument should be a string.');
+      throw new JexlFunctionExecutionError('Text argument should be a string.');
     }
 
     if (typeof textToReplace !== 'string') {
-      throw new ExecutionError('Text to replace argument should be a string.');
+      throw new JexlFunctionExecutionError('Text to replace argument should be a string.');
     }
 
     if (typeof replacement !== 'string') {
-      throw new ExecutionError('Replacement should be a string.');
+      throw new JexlFunctionExecutionError('Replacement should be a string.');
     }
 
     validateTextLength(text);
@@ -24,11 +24,11 @@ export default createModule(({ coerceToStringWithValidation, validateTextLength,
 
   const REPLACE = (text: unknown, position: number, length: unknown, replacement: unknown) => {
     if (typeof text !== 'string') {
-      throw new ExecutionError('Text argument should be a string.');
+      throw new JexlFunctionExecutionError('Text argument should be a string.');
     }
 
     if (typeof replacement !== 'string') {
-      throw new ExecutionError('Replacement should be a string.');
+      throw new JexlFunctionExecutionError('Replacement should be a string.');
     }
 
     validateTextLength(text);

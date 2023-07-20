@@ -1,4 +1,4 @@
-import { ExecutionError } from '@digifi/jexl';
+import { JexlFunctionExecutionError } from '../errors';
 import { NotEmptyValue } from '../../types';
 import { createModule } from '../utils/module';
 import createInformationModule from './information';
@@ -69,7 +69,7 @@ export default createModule(({ validateArrayMaxSize }, options) => {
       }
     }
 
-    throw new ExecutionError('Condition parameter is not defined');
+    throw new JexlFunctionExecutionError('Condition parameter is not defined');
   };
 
   const TRUE = () => {

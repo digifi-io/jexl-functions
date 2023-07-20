@@ -1,5 +1,5 @@
 import { createModule } from '../utils/module';
-import { ExecutionError } from '@digifi/jexl';
+import { JexlFunctionExecutionError } from '../errors';
 import { ICriteriaParseResult } from '../utils/criteria';
 
 const MAX_CRITERIA_COUNT = 30;
@@ -231,7 +231,7 @@ export default createModule(({
 
   const validateTableData = (table: unknown, message = 'Table variable should be an array.') => {
     if (!table || !Array.isArray(table)) {
-      throw new ExecutionError(message);
+      throw new JexlFunctionExecutionError(message);
     }
 
     validateArrayMaxSize(table, MAX_TABLE_ARRAY_LENGTH);
@@ -239,11 +239,11 @@ export default createModule(({
 
   const validateColumnData = (column: unknown) => {
     if (typeof column !== 'string') {
-      throw new ExecutionError('Column name should be a string.');
+      throw new JexlFunctionExecutionError('Column name should be a string.');
     }
 
     if (!column.length) {
-      throw new ExecutionError('Column name cannot be empty.')
+      throw new JexlFunctionExecutionError('Column name cannot be empty.')
     }
   };
 
@@ -266,7 +266,7 @@ export default createModule(({
     validateTableData(rowsToAdd, 'Added rows should be an array.');
 
     if ((rowsToAdd as []).some((row: Record<string, unknown>) => !(typeof row === 'object' && row !== null))) {
-      throw new ExecutionError('Added rows should be objects.');
+      throw new JexlFunctionExecutionError('Added rows should be objects.');
     }
 
     const originalColumnNames = getTableColumnNames(originalTable as []);
@@ -283,17 +283,17 @@ export default createModule(({
           ? `Added rows miss the following columns from the original table: ${missingColumns.join(', ')}.`
           : 'Added rows should have the same number of columns as the original table.';
 
-      throw new ExecutionError(errorMessage);
+      throw new JexlFunctionExecutionError(errorMessage);
     }
   }
 
   const validateCriteriaData = (criteriaColumn: unknown, criteria: unknown) => {
     if (typeof criteriaColumn !== 'string') {
-      throw new ExecutionError('Criteria column name should be a string.');
+      throw new JexlFunctionExecutionError('Criteria column name should be a string.');
     }
 
     if (!criteriaColumn.length) {
-      throw new ExecutionError('Criteria column name cannot be empty.');
+      throw new JexlFunctionExecutionError('Criteria column name cannot be empty.');
     }
 
     validateTextLength(criteriaColumn);
@@ -302,11 +302,11 @@ export default createModule(({
 
   const validateMultipleCriteriaData = (criteriaData: unknown[]) => {
     if (!criteriaData.length) {
-      throw new ExecutionError('There should be at least one logical criteria.');
+      throw new JexlFunctionExecutionError('There should be at least one logical criteria.');
     }
 
     if (criteriaData.length % 2 !== 0) {
-      throw new ExecutionError('Each criteria should have a column name and a criteria expression.');
+      throw new JexlFunctionExecutionError('Each criteria should have a column name and a criteria expression.');
     }
 
     validateArrayMaxSize(criteriaData, MAX_CRITERIA_COUNT * 2); // a criteria consists of a column name and logical expression

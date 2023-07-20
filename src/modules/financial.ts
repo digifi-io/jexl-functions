@@ -1,5 +1,5 @@
 import { ConfigType } from 'dayjs';
-import { ExecutionError } from '@digifi/jexl';
+import { JexlFunctionExecutionError } from '../errors';
 import { createModule } from '../utils/module';
 import dayjs from '../dayjs';
 import createDateAndTimeModule from './date-and-time';
@@ -57,31 +57,31 @@ export default createModule(({ safeFlatten, coerceToNumber }, options) => {
     const settlementDate = dayjs(settlement as ConfigType);
 
     if (!issueDate.isValid()) {
-      throw new ExecutionError('Issue date is not valid.');
+      throw new JexlFunctionExecutionError('Issue date is not valid.');
     }
 
     if (!firstDate.isValid()) {
-      throw new ExecutionError('First date is not valid.');
+      throw new JexlFunctionExecutionError('First date is not valid.');
     }
 
     if (!settlementDate.isValid()) {
-      throw new ExecutionError('Settlement date is not valid.');
+      throw new JexlFunctionExecutionError('Settlement date is not valid.');
     }
 
     if (coercedRate <= 0) {
-      throw new ExecutionError('Rate is lower or equal 0.');
+      throw new JexlFunctionExecutionError('Rate is lower or equal 0.');
     }
 
     if (coercedPar <= 0) {
-      throw new ExecutionError('Par is lower or equal 0');
+      throw new JexlFunctionExecutionError('Par is lower or equal 0');
     }
 
     if (![1, 2, 4].includes(coercedFrequency)) {
-      throw new ExecutionError('Frequency should be equal to [1, 2, 4]');
+      throw new JexlFunctionExecutionError('Frequency should be equal to [1, 2, 4]');
     }
 
     if (settlementDate <= issueDate) {
-      throw new ExecutionError('Settlement date should be greater than issue date');
+      throw new JexlFunctionExecutionError('Settlement date should be greater than issue date');
     }
 
     return coercedPar * coercedRate * dateTimeModule.YEARFRAC(issue, settlement, basis);
@@ -95,29 +95,29 @@ export default createModule(({ safeFlatten, coerceToNumber }, options) => {
     const coercedStart = Math.abs(coerceToNumber(start));
 
     if (coercedRate <= 0) {
-      throw new ExecutionError('Rate should be more than 0.');
+      throw new JexlFunctionExecutionError('Rate should be more than 0.');
     }
 
     if (coercedPeriods <= 0) {
-      throw new ExecutionError('Periods should be more than 0.');
+      throw new JexlFunctionExecutionError('Periods should be more than 0.');
     }
 
     if (coercedValue <= 0) {
-      throw new ExecutionError('Value should be more than 0.');
+      throw new JexlFunctionExecutionError('Value should be more than 0.');
     }
 
     if (coercedEnd < coercedStart) {
-      throw new ExecutionError('End should be more than start.');
+      throw new JexlFunctionExecutionError('End should be more than start.');
     }
 
     const differenceBetweenEndAndStart = coercedEnd - coercedStart;
 
     if (differenceBetweenEndAndStart > options.defaultMaxArraySize) {
-      throw new ExecutionError(`Difference between end and start should be not more than: ${options.defaultMaxArraySize}`);
+      throw new JexlFunctionExecutionError(`Difference between end and start should be not more than: ${options.defaultMaxArraySize}`);
     }
 
     if (type !== 0 && type !== 1) {
-      throw new ExecutionError('Type should be equal 0 or 1.');
+      throw new JexlFunctionExecutionError('Type should be equal 0 or 1.');
     }
 
     const payment = PMT(coercedRate, coercedPeriods, coercedValue, 0, type);
@@ -145,19 +145,19 @@ export default createModule(({ safeFlatten, coerceToNumber }, options) => {
     const coercedType = type ? coerceToNumber(type) : 0;
 
     if (coercedRate <= 0) {
-      throw new ExecutionError('Rate should be more than 0.');
+      throw new JexlFunctionExecutionError('Rate should be more than 0.');
     }
 
     if (coercedPeriods <= 0) {
-      throw new ExecutionError('Periods should be more than 0.');
+      throw new JexlFunctionExecutionError('Periods should be more than 0.');
     }
 
     if (coercedValue <= 0) {
-      throw new ExecutionError('Value should be more than 0.');
+      throw new JexlFunctionExecutionError('Value should be more than 0.');
     }
 
     if (coercedEnd < coercedStart) {
-      throw new ExecutionError('End should be more than start.');
+      throw new JexlFunctionExecutionError('End should be more than start.');
     }
 
     let principal = 0;
@@ -206,7 +206,7 @@ export default createModule(({ safeFlatten, coerceToNumber }, options) => {
     const coercedPeriods = coerceToNumber(periods);
 
     if (coercedRate <= 0 || coercedPeriods < 1) {
-      throw new ExecutionError('Incorrect incoming arguments.');
+      throw new JexlFunctionExecutionError('Incorrect incoming arguments.');
     }
 
     const flooredPeriods = Math.trunc(coercedPeriods);
@@ -228,7 +228,7 @@ export default createModule(({ safeFlatten, coerceToNumber }, options) => {
 
     for (let i = 0; i < maxIterations; i++) {
       if (rate <= -1) {
-        throw new ExecutionError('Incorrect rate.');
+        throw new JexlFunctionExecutionError('Incorrect rate.');
       }
 
       let y;
@@ -271,7 +271,7 @@ export default createModule(({ safeFlatten, coerceToNumber }, options) => {
     const coercedPeriods = coerceToNumber(periods);
 
     if (coercedRate <= 0 || coercedPeriods < 1) {
-      throw new ExecutionError('Incorrect arguments.');
+      throw new JexlFunctionExecutionError('Incorrect arguments.');
     }
 
     const flooredPeriods = Math.trunc(coercedPeriods);
@@ -308,7 +308,7 @@ export default createModule(({ safeFlatten, coerceToNumber }, options) => {
     const coercedRate = coerceToNumber(rate);
 
     if (coercedRate <= 0) {
-      throw new ExecutionError('Invalid arguments.');
+      throw new JexlFunctionExecutionError('Invalid arguments.');
     }
 
     return (Math.log(coerceToNumber(future)) - Math.log(coerceToNumber(present))) / Math.log(1 + coercedRate);

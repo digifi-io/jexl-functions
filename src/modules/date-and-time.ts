@@ -1,4 +1,4 @@
-import { ExecutionError } from '@digifi/jexl';
+import { JexlFunctionExecutionError } from '../errors';
 import { ConfigType, UnitType } from 'dayjs';
 import dayjs from '../dayjs';
 import { createModule } from '../utils/module';
@@ -252,11 +252,11 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     const weekendMask = getWeekendMask(weekend);
 
     if (coercedDays < 0) {
-      throw new ExecutionError('Days should be more than 0');
+      throw new JexlFunctionExecutionError('Days should be more than 0');
     }
 
     if (coercedDays > options.maxDaysForWorkdaysFunctions) {
-      throw new ExecutionError(`Days should be less than ${options.maxDaysForWorkdaysFunctions}`);
+      throw new JexlFunctionExecutionError(`Days should be less than ${options.maxDaysForWorkdaysFunctions}`);
     }
 
     validateWeekendMask(weekendMask);

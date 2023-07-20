@@ -1,4 +1,4 @@
-import { ExecutionError } from '@digifi/jexl';
+import { JexlFunctionExecutionError } from '../errors';
 import { createValidateArrayMaxSizeFunction } from './validation';
 
 export const createSaveFlattenFunction = (maxFlattenArraySize: number) => {
@@ -12,7 +12,7 @@ export const createSaveFlattenFunction = (maxFlattenArraySize: number) => {
       const argArrayLength = Array.isArray(arg) ? arg.length : 1;
 
       if (currentFlattenArrayLength + argArrayLength > maxFlattenArraySize) {
-        throw new ExecutionError(
+        throw new JexlFunctionExecutionError(
           `Items size exceeded. Provided ${currentFlattenArrayLength + argArrayLength}, maximum ${maxFlattenArraySize}`
         );
       }

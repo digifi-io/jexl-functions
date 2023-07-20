@@ -22,4 +22,6 @@ const jexlFunctions = {
   ...createTableModule(),
 };
 
+export * from './errors';
+
 export default jexlFunctions;
