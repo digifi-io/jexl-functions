@@ -32,15 +32,15 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     const weekendMaskRegex = new RegExp('^[0|1]{7}$');
 
     if (typeof weekend !== 'string') {
-      throw new Error('Weekend should be a string')
+      throw new JexlFunctionExecutionError('Weekend should be a string')
     }
 
     if (!weekendMaskRegex.test(weekend)) {
-      throw new Error('Weekend string doesn\'t much patter');
+      throw new JexlFunctionExecutionError('Weekend string doesn\'t much patter');
     }
 
     if (!weekend.includes('0')) {
-      throw new Error('At least one working day should exists');
+      throw new JexlFunctionExecutionError('At least one working day should exists');
     }
   };
 
@@ -51,7 +51,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
       const holidayDate = dayjs(holiday as ConfigType);
 
       if (!holidayDate.isValid()) {
-        throw new Error('Holiday date is not valid.');
+        throw new JexlFunctionExecutionError('Holiday date is not valid.');
       }
 
       holidaysSet.add(`${holidayDate.month()}/${holidayDate.date()}/${holidayDate.year()}`);
@@ -76,7 +76,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     const mask = WEEKEND_MASK_BY_NUMBER[weekend];
 
     if (!mask) {
-      throw new Error('Incorrect weekend');
+      throw new JexlFunctionExecutionError('Incorrect weekend');
     }
 
     return mask;
@@ -121,7 +121,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
         return (secondDateDay + secondDateMonth * 30 + secondDateYear * 360 - (firstDateDay + firstDateMonth * 30 + firstDateYear * 360)) / 360;
       }
       default: {
-        throw new Error('Incorrect basis provided.');
+        throw new JexlFunctionExecutionError('Incorrect basis provided.');
       }
     }
   };
@@ -183,7 +183,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     const startDateObject = dayjs(startDate as ConfigType);
 
     if (!startDateObject.isValid()) {
-      throw new Error('Invalid start date.');
+      throw new JexlFunctionExecutionError('Invalid start date.');
     }
 
     return dayjs({
@@ -205,11 +205,11 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     validateWeekendMask(weekendMask);
 
     if (!startDateObject.isValid()) {
-      throw new Error('Start date is invalid');
+      throw new JexlFunctionExecutionError('Start date is invalid');
     }
 
     if (!endDateObject.isValid()) {
-      throw new Error('End date is invalid');
+      throw new JexlFunctionExecutionError('End date is invalid');
     }
 
     const holidaysSet = generateHolidaysSet(transformedHolidays);
@@ -220,7 +220,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     let iterationDate = dayjs(startDateObject);
 
     if (days > options.maxDaysForWorkdaysFunctions) {
-      throw new Error(`Days between dates should be less than ${options.maxDaysForWorkdaysFunctions}`);
+      throw new JexlFunctionExecutionError(`Days between dates should be less than ${options.maxDaysForWorkdaysFunctions}`);
     }
 
     let total = days < 0 ? days - 1 : days + 1;
