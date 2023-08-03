@@ -17,3 +17,11 @@ export const coerceToNumber = (value: unknown) => {
 
   return Number(value);
 };
+
+export const coerceNullableArrayToArray = (value: [] | null | undefined) => {
+  if (value === null || value === undefined) {
+    return [];
+  }
+
+  return value as [];
+};
