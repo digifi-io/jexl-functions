@@ -231,7 +231,11 @@ export default createModule(({
   };
 
   const validateTableData = (table: unknown, message = 'Table variable should be an array.') => {
-    if (!table || !Array.isArray(table)) {
+    if (table === null || table === undefined) {
+      return;
+    }
+
+    if (!Array.isArray(table)) {
       throw new JexlFunctionExecutionError(message);
     }
 
