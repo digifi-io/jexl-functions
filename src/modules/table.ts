@@ -12,6 +12,7 @@ type ParsedCriteriaResult = {
 
 export default createModule(({
   coerceToNumber,
+  coerceToArray,
   validateArrayMaxSize,
   validateTextLength,
   validateCriteria,
@@ -21,7 +22,7 @@ export default createModule(({
   const TABLESUM = (table: unknown, columnName: unknown) => {
     validateTableAndColumnData(table, columnName);
 
-    return (table as []).reduce((sum: number, tableRow: Record<string, unknown>) => {
+    return coerceToArray(table as []).reduce((sum: number, tableRow: Record<string, unknown>) => {
       return sum + coerceToNumber(tableRow[columnName as string]);
     }, 0);
   };
@@ -35,7 +36,7 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return (table as []).reduce((sum: number, tableRow: Record<string, unknown>) => {
+    return coerceToArray(table as []).reduce((sum: number, tableRow: Record<string, unknown>) => {
       const evaluationResult = parsedCriteriaData.every(({ parsedCriteria, criteriaColumn }) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
 
       return sum + (evaluationResult ? coerceToNumber(tableRow[columnName]) : 0)
@@ -47,7 +48,7 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return (table as []).reduce((sum: number, tableRow: Record<string, unknown>) => {
+    return coerceToArray(table as []).reduce((sum: number, tableRow: Record<string, unknown>) => {
       const evaluationResult = parsedCriteriaData.some(({ parsedCriteria, criteriaColumn }) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
 
       return sum + (evaluationResult ? coerceToNumber(tableRow[columnName]) : 0)
@@ -57,7 +58,7 @@ export default createModule(({
   const TABLECOUNT = (table: unknown, columnName: string) => {
     validateTableAndColumnData(table, columnName);
 
-    return (table as []).reduce((count: number, tableRow: Record<string, unknown>) => {
+    return coerceToArray(table as []).reduce((count: number, tableRow: Record<string, unknown>) => {
       return count + (tableRow[columnName] !== undefined && tableRow[columnName] !== null ? 1 : 0);
     }, 0);
   };
@@ -71,7 +72,7 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return (table as []).reduce((count: number, tableRow: Record<string, unknown>) => {
+    return coerceToArray(table as []).reduce((count: number, tableRow: Record<string, unknown>) => {
       const evaluationResult = parsedCriteriaData.every(({ parsedCriteria, criteriaColumn }) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
 
       return count + (evaluationResult && tableRow[columnName] !== undefined && tableRow[columnName] !== null ? 1 : 0);
@@ -83,7 +84,7 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return (table as []).reduce((count: number, tableRow: Record<string, unknown>) => {
+    return coerceToArray(table as []).reduce((count: number, tableRow: Record<string, unknown>) => {
       const evaluationResult = parsedCriteriaData.some(({ parsedCriteria, criteriaColumn }) => evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string]));
 
       return count + (evaluationResult && tableRow[columnName] !== undefined && tableRow[columnName] !== null ? 1 : 0);
@@ -93,7 +94,7 @@ export default createModule(({
   const TABLEMAX = (table: unknown, columnName: string) => {
     validateTableAndColumnData(table, columnName);
 
-    return Math.max(...extractValidNumbersFromTable(table as [], columnName));
+    return Math.max(...extractValidNumbersFromTable(coerceToArray(table as []), columnName));
   };
 
   const TABLEMAXIF = (table: unknown, columnName: string, criteriaColumn: unknown, criteria: unknown) => {
@@ -105,7 +106,7 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return Math.max(...extractValidNumbersFromTableWithAllPassingCriteria(table as [], columnName, parsedCriteriaData));
+    return Math.max(...extractValidNumbersFromTableWithAllPassingCriteria(coerceToArray(table as []), columnName, parsedCriteriaData));
   };
 
   const TABLEMAXIFSOR = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
@@ -113,13 +114,13 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return Math.max(...extractValidNumbersFromTableWithSomePassingCriteria(table as [], columnName, parsedCriteriaData));
+    return Math.max(...extractValidNumbersFromTableWithSomePassingCriteria(coerceToArray(table as []), columnName, parsedCriteriaData));
   };
 
   const TABLEMIN = (table: unknown, columnName: string) => {
     validateTableAndColumnData(table, columnName);
 
-    return Math.min(...extractValidNumbersFromTable(table as [], columnName));
+    return Math.min(...extractValidNumbersFromTable(coerceToArray(table as []), columnName));
   };
 
   const TABLEMINIF = (table: unknown, columnName: string, criteriaColumn: unknown, criteria: unknown) => {
@@ -131,7 +132,7 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return Math.min(...extractValidNumbersFromTableWithAllPassingCriteria(table as [], columnName, parsedCriteriaData));
+    return Math.min(...extractValidNumbersFromTableWithAllPassingCriteria(coerceToArray(table as []), columnName, parsedCriteriaData));
   };
 
   const TABLEMINIFSOR = (table: unknown, columnName: string, ...criteriaData: unknown[]) => {
@@ -139,7 +140,7 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return Math.min(...extractValidNumbersFromTableWithSomePassingCriteria(table as [], columnName, parsedCriteriaData));
+    return Math.min(...extractValidNumbersFromTableWithSomePassingCriteria(coerceToArray(table as []), columnName, parsedCriteriaData));
   };
 
   const TABLEAVG = (table: unknown, columnName: unknown) => {
@@ -167,7 +168,7 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return (table as []).filter((tableRow: Record<string, unknown>) =>
+    return coerceToArray(table as []).filter((tableRow: Record<string, unknown>) =>
       parsedCriteriaData.every(({ parsedCriteria, criteriaColumn }) =>
         evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string])
       )
@@ -179,7 +180,7 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return (table as []).filter((tableRow: Record<string, unknown>) =>
+    return coerceToArray(table as []).filter((tableRow: Record<string, unknown>) =>
       parsedCriteriaData.some(({ parsedCriteria, criteriaColumn }) =>
         evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string])
       )
@@ -191,7 +192,7 @@ export default createModule(({
 
     const parsedCriteriaData = getParsedMultipleCriteriaResult(criteriaData);
 
-    return (table as []).every((tableRow: Record<string, unknown>) =>
+    return coerceToArray(table as []).every((tableRow: Record<string, unknown>) =>
       parsedCriteriaData.every(({ parsedCriteria, criteriaColumn }) =>
         evalCriteriaParseResult(parsedCriteria, tableRow[criteriaColumn as string])
       )
@@ -203,7 +204,7 @@ export default createModule(({
 
     validateRowsToAddData(rowsToAdd, table);
 
-    const combinedTable = (table as []).concat(rowsToAdd as []);
+    const combinedTable = coerceToArray(table as []).concat(coerceToArray(rowsToAdd as []));
 
     validateArrayMaxSize(combinedTable, MAX_TABLE_ARRAY_LENGTH);
 
@@ -265,13 +266,13 @@ export default createModule(({
   const validateRowsToAddData = (rowsToAdd: unknown, originalTable: unknown) => {
     validateTableData(rowsToAdd, 'Added rows should be an array.');
 
-    if ((rowsToAdd as []).some((row: Record<string, unknown>) => !(typeof row === 'object' && row !== null))) {
+    if (coerceToArray(rowsToAdd as []).some((row: Record<string, unknown>) => !(typeof row === 'object' && row !== null))) {
       throw new JexlFunctionExecutionError('Added rows should be objects.');
     }
 
-    const originalColumnNames = getTableColumnNames(originalTable as []);
+    const originalColumnNames = getTableColumnNames(coerceToArray(originalTable as []) as []);
     const originalColumnNamesArray = [...originalColumnNames];
-    const addedRowsColumnNames = getTableColumnNames(rowsToAdd as []);
+    const addedRowsColumnNames = getTableColumnNames(coerceToArray(rowsToAdd as []) as []);
 
     if (
       originalColumnNames.size !== addedRowsColumnNames.size ||
@@ -313,7 +314,7 @@ export default createModule(({
   };
 
   const extractValidNumbersFromTable = (table: unknown[], columnName: string) => {
-    return (table as []).reduce((accumulator: number[], tableRow: Record<string, unknown>) => {
+    return coerceToArray(table as []).reduce((accumulator: number[], tableRow: Record<string, unknown>) => {
         if (tableRow[columnName] !== undefined && tableRow[columnName] !== null) {
           accumulator.push(coerceToNumber(tableRow[columnName]));
         }
@@ -323,7 +324,7 @@ export default createModule(({
   };
 
   const extractValidNumbersFromTableWithAllPassingCriteria = (table: unknown[], columnName: string, parsedCriteriaData: ParsedCriteriaResult[]) => {
-    return (table as []).reduce((accumulator: number[], tableRow: Record<string, unknown>) => {
+    return coerceToArray(table as []).reduce((accumulator: number[], tableRow: Record<string, unknown>) => {
         if (tableRow[columnName] === undefined || tableRow[columnName] === null) {
           return accumulator;
         }
@@ -341,7 +342,7 @@ export default createModule(({
   };
 
   const extractValidNumbersFromTableWithSomePassingCriteria = (table: unknown[], columnName: string, parsedCriteriaData: ParsedCriteriaResult[]) => {
-    return (table as []).reduce((accumulator: number[], tableRow: Record<string, unknown>) => {
+    return coerceToArray(table as []).reduce((accumulator: number[], tableRow: Record<string, unknown>) => {
       if (tableRow[columnName] === undefined || tableRow[columnName] === null) {
         return accumulator;
       }

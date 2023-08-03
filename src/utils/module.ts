@@ -5,7 +5,7 @@ import {
 } from './validation';
 import { createSaveFlattenFunction } from './array';
 import { evalCriteriaParseResult, parseCriteriaExpression } from './criteria';
-import { coerceToString, coerceToNumber } from './coerceUtils';
+import { coerceToString, coerceToNumber, coerceNullableArrayToArray } from './coerceUtils';
 
 export interface ModuleUtils {
   validateTextLength: ReturnType<typeof createValidateTextLengthFunction>;
@@ -17,6 +17,7 @@ export interface ModuleUtils {
   coerceToNumber: typeof coerceToNumber;
   coerceToString: typeof coerceToString;
   coerceToStringWithValidation: (text: unknown, maxTextLengthOverride?: number) => string;
+  coerceToArray: typeof coerceNullableArrayToArray;
 }
 
 export interface IBaseCreateModuleOptions {
@@ -74,6 +75,7 @@ export function createModule<ReturnType>(
       parseCriteriaExpression,
       coerceToNumber,
       coerceToString,
+      coerceToArray: coerceNullableArrayToArray,
     }, currentOptions);
   };
 }
