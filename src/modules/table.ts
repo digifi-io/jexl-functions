@@ -3,7 +3,7 @@ import { JexlFunctionExecutionError } from '../errors';
 import { ICriteriaParseResult } from '../utils/criteria';
 
 const MAX_CRITERIA_COUNT = 30;
-const MAX_TABLE_ARRAY_LENGTH = 100;
+const MAX_TABLE_ARRAY_LENGTH = 3000;
 
 type ParsedCriteriaResult = {
   parsedCriteria: ICriteriaParseResult;
