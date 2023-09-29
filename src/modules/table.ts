@@ -3,7 +3,7 @@ import { JexlFunctionExecutionError } from '../errors';
 import { ICriteriaParseResult } from '../utils/criteria';
 
 const MAX_CRITERIA_COUNT = 30;
-const MAX_TABLE_ARRAY_LENGTH = 100;
+const MAX_TABLE_ARRAY_LENGTH = 3000;
 
 type ParsedCriteriaResult = {
   parsedCriteria: ICriteriaParseResult;
@@ -199,6 +199,21 @@ export default createModule(({
     );
   }
 
+  const TABLECONCATROWS = (table: unknown, rowsToAdd: unknown) => {
+    validateTableData(table);
+
+    validateRowsToAddData(rowsToAdd, table);
+
+    const combinedTable = coerceToArray(table as []).concat(coerceToArray(rowsToAdd as []));
+
+    validateArrayMaxSize(combinedTable, MAX_TABLE_ARRAY_LENGTH);
+
+    return combinedTable;
+  }
+
+  /**
+   * @deprecated Invalid function name. Use TABLECONCATROWS instead.
+   */
   const TABLECONTCATROWS = (table: unknown, rowsToAdd: unknown) => {
     validateTableData(table);
 
@@ -272,23 +287,6 @@ export default createModule(({
 
     if (coerceToArray(rowsToAdd as []).some((row: Record<string, unknown>) => !(typeof row === 'object' && row !== null))) {
       throw new JexlFunctionExecutionError('Added rows should be objects.');
-    }
-
-    const originalColumnNames = getTableColumnNames(coerceToArray(originalTable as []) as []);
-    const originalColumnNamesArray = [...originalColumnNames];
-    const addedRowsColumnNames = getTableColumnNames(coerceToArray(rowsToAdd as []) as []);
-
-    if (
-      (originalColumnNames.size && addedRowsColumnNames.size && originalColumnNames.size !== addedRowsColumnNames.size)
-      || originalColumnNamesArray.some((originalColumnName) => !addedRowsColumnNames.has(originalColumnName))
-    ) {
-      const missingColumns = originalColumnNamesArray.filter((originalColumnName) => !addedRowsColumnNames.has(originalColumnName));
-      const errorMessage =
-        missingColumns.length > 0
-          ? `Added rows miss the following columns from the original table: ${missingColumns.join(', ')}.`
-          : 'Added rows should have the same number of columns as the original table.';
-
-      throw new JexlFunctionExecutionError(errorMessage);
     }
   }
 
@@ -388,6 +386,7 @@ export default createModule(({
     TABLEFILTERROWSIFS,
     TABLEFILTERROWSIFSOR,
     TABLEMATCHESCONDITIONS,
+    TABLECONCATROWS,
     TABLECONTCATROWS,
   };
 });
