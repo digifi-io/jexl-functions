@@ -78,6 +78,14 @@ export default createModule(({ coerceToStringWithValidation }) => {
     return !ISEMPTYORBLANK(value);
   };
 
+  const ISEMPTYARRAY = (value: unknown) => {
+    return value === null || value === undefined || (Array.isArray(value) && !value.length);
+  };
+
+  const ISNOTEMPTYARRAY = (value: unknown) => {
+    return !ISEMPTYARRAY(value);
+  };
+
   return {
     ISEVEN,
     ISTEXT,
@@ -96,5 +104,7 @@ export default createModule(({ coerceToStringWithValidation }) => {
     ISBLANK,
     ISEMPTYORBLANK,
     ISNOTEMPTYORBLANK,
+    ISEMPTYARRAY,
+    ISNOTEMPTYARRAY,
   };
 });
