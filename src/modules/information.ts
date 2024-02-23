@@ -60,6 +60,10 @@ export default createModule(({ coerceToStringWithValidation }) => {
   };
 
   const ISDATESTRING = (value: unknown, format?: unknown): value is string => {
+    if (typeof value === 'string' && !isNaN(Number(value))) {
+      return false;
+    }
+
     return (
       typeof value === 'string' &&
       dayjs(value, coerceToStringWithValidation(format) || undefined, true).isValid()
