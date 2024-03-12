@@ -163,7 +163,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
 
   const MONTH = (date: unknown, format?: unknown) => {
     return dayjs(date as ConfigType, coerceToStringWithValidation(format) || undefined).month() + 1;
-  }
+  };
 
   const TODAY = (format?: unknown) => {
     const now = dayjs();
@@ -289,7 +289,9 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
   };
 
   const EDATE = (date: unknown, months: unknown, format?: unknown) => {
-    return dayjs(date as ConfigType).add(coerceToNumber(months), 'months').format(coerceToStringWithValidation(format) || undefined);
+    return dayjs(date as ConfigType)
+      .add(coerceToNumber(months), 'months')
+      .format(coerceToStringWithValidation(format) || undefined);
   };
 
   const DAYS360 = (startDate: unknown, endDate: unknown, method?: unknown) => {
