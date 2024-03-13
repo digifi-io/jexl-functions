@@ -78,7 +78,7 @@ describe('Financial Module', () => {
       const periods = 12;
 
       expect(() => EFFECT(nominalRate, periods))
-        .toThrow(new JexlFunctionExecutionError('Incorrect incoming arguments.'))
+        .toThrow(new JexlFunctionExecutionError('Incorrect incoming arguments.'));
     });
 
     test('should throw error for invalid arguments', () => {

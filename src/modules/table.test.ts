@@ -112,7 +112,7 @@ describe('Table Module', () => {
         { id: 2, value: 20 },
       ];
       expect(() => TABLESUMIF(table, 'value', 'category', 1))
-        .toThrow('Criteria must be a string or array. Provided number')
+        .toThrow('Criteria must be a string or array. Provided number');
     });
   });
 

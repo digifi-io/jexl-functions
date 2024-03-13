@@ -38,4 +38,4 @@ describe('Array module', () => {
         .toThrow(new JexlFunctionExecutionError(`Items size exceeded. Provided ${testArray.length}, maximum 3`));
     });
   });
-})
+});

@@ -223,7 +223,7 @@ describe('Information Module', () => {
     test('should return true for true and for an empty object value', () => {
       expect(ISODD(true)).toBe(true);
       expect(ISODD({})).toBe(true);
-    })
+    });
   });
 
   describe('ISNUMBER function', () => {

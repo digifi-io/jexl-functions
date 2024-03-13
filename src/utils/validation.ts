@@ -47,5 +47,5 @@ export const createValidateCriteria = (maxStringCriteriaLength: number) => {
     if (!CRITERIA_OPERATORS_SET.has(operation)) {
       throw new JexlFunctionExecutionError('Criteria operation is invalid.');
     }
-  }
+  };
 };

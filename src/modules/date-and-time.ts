@@ -32,7 +32,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     const weekendMaskRegex = new RegExp('^[0|1]{7}$');
 
     if (typeof weekend !== 'string') {
-      throw new JexlFunctionExecutionError('Weekend should be a string')
+      throw new JexlFunctionExecutionError('Weekend should be a string');
     }
 
     if (!weekendMaskRegex.test(weekend)) {
@@ -306,7 +306,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
       const startMonth = startDateObject.month();
 
       const startDay = startDateObject.date() === 31 ? 30 : startDateObject.date();
-      const endDay = endDateObject.date() === 31 ? 30 : endDateObject.date()
+      const endDay = endDateObject.date() === 31 ? 30 : endDateObject.date();
 
       return 360 * (endDateObject.year() - startDateObject.year()) + 30 * (endMonth - startMonth) + (endDay - startDay);
     }
@@ -314,7 +314,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     const nextMonthStartDate = dayjs({ year: startDateObject.year(), month: startMonth + 1, day: 0 } as unknown as ConfigType)
       .add(-1, 'day');
     const nextMonthEndDate = dayjs({ year: endDateObject.year(), month: endMonth + 1, day: 0 } as unknown as ConfigType)
-      .add(-1, 'day')
+      .add(-1, 'day');
 
     const startDay = startDateObject.date() === nextMonthStartDate.date() ? 30 : startDateObject.date();
 

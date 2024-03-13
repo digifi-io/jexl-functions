@@ -44,4 +44,4 @@ describe('Address module', () => {
       expect(BUILDFULLADDRESS({ test: 'test' })).toBe('');
     });
   });
-})
+});
