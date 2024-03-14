@@ -446,7 +446,7 @@ describe('Date And Time Module', () => {
 
       const result = EOMONTH(startDate, months);
 
-      expect(result).toEqual('2024-05-31T00:00:00+03:00');
+      expect(result).toEqual(dayjs('2024-05-31').format());
     });
 
     test('should return the end of the month correctly for a valid start date with custom format', () => {
