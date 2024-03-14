@@ -1,1 +1,1 @@
-export type NotEmptyValue = string | boolean | number | object | symbol;
+export type NotEmptyValue = string | boolean | number | object;
