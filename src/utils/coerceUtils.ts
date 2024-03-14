@@ -3,7 +3,7 @@ export const coerceToString = (value: unknown) => {
     return '';
   }
 
-  return (value as string | boolean | object | Symbol | number).toString();
+  return (value as string | boolean | object | symbol | number).toString();
 };
 
 export const coerceToNumber = (value: unknown) => {

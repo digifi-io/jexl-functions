@@ -211,7 +211,7 @@ export default createModule(({ safeFlatten, coerceToNumber }, options) => {
 
     const flooredPeriods = Math.trunc(coercedPeriods);
 
-    return Math.pow(1 + coercedRate / flooredPeriods, flooredPeriods) - 1
+    return Math.pow(1 + coercedRate / flooredPeriods, flooredPeriods) - 1;
   };
 
   const RATE = (periods: unknown, payment: unknown, present: unknown, future: unknown, type: unknown, guess: unknown) => {

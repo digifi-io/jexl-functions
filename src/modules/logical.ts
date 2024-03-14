@@ -32,7 +32,7 @@ export default createModule(({ validateArrayMaxSize }, options) => {
     validateArrayMaxSize(args);
 
     const passedCount = args.reduce((previousPassedCount: number, arg) => {
-      return !!arg ? previousPassedCount + 1 : previousPassedCount;
+      return arg ? previousPassedCount + 1 : previousPassedCount;
     }, 0);
 
     return !!(Math.floor(Math.abs(passedCount)) & 1);

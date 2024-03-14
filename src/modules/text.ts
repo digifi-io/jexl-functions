@@ -17,7 +17,7 @@ export default createModule(({ coerceToStringWithValidation, validateTextLength,
 
     validateTextLength(text);
     validateTextLength(textToReplace);
-    validateTextLength(replacement)
+    validateTextLength(replacement);
 
     return text.replaceAll(textToReplace, replacement);
   };
@@ -32,12 +32,13 @@ export default createModule(({ coerceToStringWithValidation, validateTextLength,
     }
 
     validateTextLength(text);
-    validateTextLength(replacement)
+    validateTextLength(replacement);
 
     return text.substring(0, position - 1) + replacement + text.substring(position - 1 + coerceToNumber(length));
   };
 
   const CLEAN = (text: unknown) => {
+    // eslint-disable-next-line no-control-regex
     const regex = /[\0-\x1F]/g;
 
     return coerceToStringWithValidation(text).replace(regex, '');
@@ -92,7 +93,7 @@ export default createModule(({ coerceToStringWithValidation, validateTextLength,
   const RIGHT = (text: unknown, length: unknown) => {
     const textString = coerceToStringWithValidation(text);
 
-    return textString.substring(textString.length - coerceToNumber(length))
+    return textString.substring(textString.length - coerceToNumber(length));
   };
 
   const SEARCH = (valueToSearch: unknown, text: unknown, position: unknown = 0) => {
