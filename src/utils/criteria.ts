@@ -43,7 +43,7 @@ export const parseCriteriaExpression = (criteria: ICriteria): ICriteriaParseResu
       operator,
       rightOperand,
       disableCoercing: true,
-    }
+    };
   }
 
   if (isSystemCriteria(criteria)) {
@@ -100,7 +100,7 @@ const evalOperationParseResult = (parseResult: IOperationParseResult, leftOperan
       return leftOperand === coercedRightOperand;
     }
   }
-}
+};
 
 const evalSystemCriteriaParseResult = (parseResult: ISystemCriteriaParseResult, leftOperand: unknown) => {
   switch (parseResult.systemCriteria) {

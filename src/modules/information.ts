@@ -36,6 +36,7 @@ export default createModule(({ coerceToStringWithValidation }) => {
   };
 
   const ISEMPTY = (value: unknown, checkForEmptyString?: unknown) => {
+    // eslint-disable-next-line eqeqeq
     if (checkForEmptyString == true && value === '') {
       return true;
     }

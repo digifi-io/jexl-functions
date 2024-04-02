@@ -78,7 +78,7 @@ export default createModule(({
   };
 
   const TANH = (value: unknown) => {
-    const exp = Math.exp(2 * coerceToNumber(value))
+    const exp = Math.exp(2 * coerceToNumber(value));
 
     return (exp - 1) / (exp + 1);
   };
@@ -87,7 +87,7 @@ export default createModule(({
     const coercedValue = coerceToNumber(value);
     const coercedDigits = coerceToNumber(digits);
 
-    const sign = coercedValue > 0 ? 1 : -1
+    const sign = coercedValue > 0 ? 1 : -1;
 
     return (sign * Math.floor(Math.abs(coercedValue) * Math.pow(10, coercedDigits))) / Math.pow(10, coercedDigits);
   };
@@ -134,7 +134,7 @@ export default createModule(({
 
       return previousValue + (coercedArg * coercedArg + coercedSecondArg * coercedSecondArg);
     }, 0);
-  }
+  };
 
   const SUMXMY2 = (firstArray: unknown, secondArray: unknown) => {
     const transformedFirstArray = Array.isArray(firstArray) ? firstArray : [firstArray];
@@ -281,7 +281,7 @@ export default createModule(({
 
     const ceilledValue = Math.ceil(Math.abs(coercedValue));
 
-    const result = ceilledValue & 1 ? ceilledValue : ceilledValue + 1
+    const result = ceilledValue & 1 ? ceilledValue : ceilledValue + 1;
 
     return coercedValue >= 0 ? result : -result;
   };
