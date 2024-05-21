@@ -8,6 +8,7 @@ import createTextModule from './modules/text';
 import createMathAndTrigModule from './modules/math-and-trig';
 import createAddressModule from './modules/address';
 import createTableModule from './modules/table';
+import createGeneralModule from './modules/general';
 
 const jexlFunctions = {
   ...createArrayModule(),
@@ -20,6 +21,7 @@ const jexlFunctions = {
   ...createMathAndTrigModule(),
   ...createAddressModule(),
   ...createTableModule(),
+  ...createGeneralModule(),
 };
 
 export * from './errors';
