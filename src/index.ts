@@ -9,6 +9,7 @@ import createMathAndTrigModule from './modules/math-and-trig';
 import createAddressModule from './modules/address';
 import createTableModule from './modules/table';
 import createGeneralModule from './modules/general';
+import createFormattingModule from './modules/formatting';
 
 const jexlFunctions = {
   ...createArrayModule(),
@@ -22,6 +23,7 @@ const jexlFunctions = {
   ...createAddressModule(),
   ...createTableModule(),
   ...createGeneralModule(),
+  ...createFormattingModule(),
 };
 
 export * from './errors';
