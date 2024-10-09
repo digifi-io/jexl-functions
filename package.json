@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/digifi-io/jexl-functions#readme",
   "dependencies": {
+    "bignumber.js": "^9.1.2",
     "dayjs": "1.11.5",
     "lodash": "^4.17.21",
     "uuid": "^9.0.1"
