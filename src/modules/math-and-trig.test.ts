@@ -408,6 +408,7 @@ describe('Math And Trig Module', () => {
       expect(TRUNC(3.14159, 2)).toBeCloseTo(3.14);
       expect(TRUNC(123.456, 0)).toBe(123);
       expect(TRUNC(987.654, 3)).toBeCloseTo(987.654);
+      expect(TRUNC(2955.95, 2)).toBe(2955.95);
 
       // Test with negative values
       expect(TRUNC(-3.14159, 2)).toBeCloseTo(-3.14);
@@ -427,9 +428,9 @@ describe('Math And Trig Module', () => {
       // Test with non-numeric inputs
       expect(TRUNC('invalid', 2)).toBeNaN();
       expect(TRUNC(true, 2)).toBe(1);
-      expect(TRUNC(null, 2)).toBe(-0);
-      expect(TRUNC(undefined, 2)).toBe(-0);
-      expect(TRUNC([], 2)).toBe(-0);
+      expect(TRUNC(null, 2)).toBe(0);
+      expect(TRUNC(undefined, 2)).toBe(0);
+      expect(TRUNC([], 2)).toBe(0);
       expect(TRUNC({}, 2)).toBeNaN();
     });
   });

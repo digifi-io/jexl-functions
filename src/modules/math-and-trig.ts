@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import { JexlFunctionExecutionError } from '../errors';
 import { createModule } from '../utils/module';
 import { ICriteria } from '../utils/criteria';
@@ -87,9 +88,22 @@ export default createModule(({
     const coercedValue = coerceToNumber(value);
     const coercedDigits = coerceToNumber(digits);
 
-    const sign = coercedValue > 0 ? 1 : -1;
+    const factor = new BigNumber(10).pow(coercedDigits);
 
-    return (sign * Math.floor(Math.abs(coercedValue) * Math.pow(10, coercedDigits))) / Math.pow(10, coercedDigits);
+    /**
+     * [TODO] Rewrite to toLocaleString('en-US', {
+     *    minimumFractionDigits: 2,
+     *    maximumFractionDigits: 2,
+     *    useGrouping: false,
+     *    roundingMode: "trunc"
+     * }); after we will migrate to node.js 20
+     */
+
+    return BigNumber(coercedValue)
+      .multipliedBy(factor)
+      .integerValue(BigNumber.ROUND_DOWN)
+      .dividedBy(factor)
+      .toNumber();
   };
 
   const SUM = (...args: unknown[]) => {
