@@ -6,7 +6,7 @@ import { ICriteria } from '../utils/criteria';
 export default createModule(({
   safeFlatten,
   coerceToNumber,
-  validateArrayMaxSize,
+  validateArrayLikeValueMaxSize,
   evalCriteriaParseResult,
   parseCriteriaExpression,
   validateCriteria,
@@ -20,7 +20,7 @@ export default createModule(({
   };
 
   const UNFLATTENPRODUCT = (...args: unknown[]) => {
-    validateArrayMaxSize(args);
+    validateArrayLikeValueMaxSize(args);
 
     return args.reduce((product: number, arg) => product * coerceToNumber(arg), 1);
   };
@@ -124,8 +124,8 @@ export default createModule(({
     const transformedFirstArray = Array.isArray(firstArray) ? firstArray : [firstArray];
     const transformedSecondArray = Array.isArray(secondArray) ? secondArray : [secondArray];
 
-    validateArrayMaxSize(transformedFirstArray);
-    validateArrayMaxSize(transformedSecondArray);
+    validateArrayLikeValueMaxSize(transformedFirstArray);
+    validateArrayLikeValueMaxSize(transformedSecondArray);
 
     return transformedFirstArray.reduce((previousValue: number, arg, index) => {
       const coercedArg = coerceToNumber(arg);
@@ -139,8 +139,8 @@ export default createModule(({
     const transformedFirstArray = Array.isArray(firstArray) ? firstArray : [firstArray];
     const transformedSecondArray = Array.isArray(secondArray) ? secondArray : [secondArray];
 
-    validateArrayMaxSize(transformedFirstArray);
-    validateArrayMaxSize(transformedSecondArray);
+    validateArrayLikeValueMaxSize(transformedFirstArray);
+    validateArrayLikeValueMaxSize(transformedSecondArray);
 
     return transformedFirstArray.reduce((previousValue: number, arg, index) => {
       const coercedArg = coerceToNumber(arg);
@@ -154,8 +154,8 @@ export default createModule(({
     const transformedFirstArray = Array.isArray(firstArray) ? firstArray : [firstArray];
     const transformedSecondArray = Array.isArray(secondArray) ? secondArray : [secondArray];
 
-    validateArrayMaxSize(transformedFirstArray);
-    validateArrayMaxSize(transformedSecondArray);
+    validateArrayLikeValueMaxSize(transformedFirstArray);
+    validateArrayLikeValueMaxSize(transformedSecondArray);
 
     return transformedFirstArray.reduce((previousValue: number, arg, index) => {
       const coercedArg = coerceToNumber(arg);

@@ -1,4 +1,4 @@
-import { coerceNullableArrayToArray, coerceToNumber, coerceToString } from './coerceUtils';
+import { coerceNullishValueToArray, coerceToNumber, coerceToString } from './coerceUtils';
 
 describe('CoerceUtils', () => {
   describe('coerceToString function', () => {
@@ -107,25 +107,25 @@ describe('CoerceUtils', () => {
   });
 
 
-  describe('coerceNullableArrayToArray function', () => {
+  describe('coerceNullishValueToArray function', () => {
     test('should return an empty array when value is null', () => {
       const value = null;
-      expect(coerceNullableArrayToArray(value)).toEqual([]);
+      expect(coerceNullishValueToArray(value)).toEqual([]);
     });
 
     test('should return an empty array when value is undefined', () => {
       const value = undefined;
-      expect(coerceNullableArrayToArray(value)).toEqual([]);
+      expect(coerceNullishValueToArray(value)).toEqual([]);
     });
 
     test('should return the same array when value is a non-empty array', () => {
       const value = [1, 2, 3];
       // @ts-ignore
-      expect(coerceNullableArrayToArray(value)).toEqual([1, 2, 3]);
+      expect(coerceNullishValueToArray(value)).toEqual([1, 2, 3]);
     });
 
     test('should return an empty array when value is an empty array', () => {
-      expect(coerceNullableArrayToArray([])).toEqual([]);
+      expect(coerceNullishValueToArray([])).toEqual([]);
     });
   });
 });

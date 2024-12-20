@@ -1,4 +1,5 @@
 import LogicalModule from './logical';
+import { JexlFunctionExecutionError } from '../errors';
 
 const {
   AND,
@@ -526,24 +527,70 @@ describe('Logical Module', () => {
   });
 
   describe('INCLUDES function', () => {
-    test('should return true if value is included in the set', () => {
-      expect(INCLUDES(2, [1, 2, 3])).toBe(true);
-      expect(INCLUDES('a', ['a', 'b', 'c'])).toBe(true);
-      expect(INCLUDES(true, [false, true])).toBe(true);
-      expect(INCLUDES(5, [1, 2, 3])).toBe(false);
-      expect(INCLUDES('d', ['a', 'b', 'c'])).toBe(false);
-      expect(INCLUDES(false, [true])).toBe(false);
+    test.each([
+      [2, [1, 2, 3], true],
+      ['a', ['a', 'b', 'c'], true],
+      [true, [false, true], true],
+      [5, [1, 2, 3], false],
+      ['d', ['a', 'b', 'c'], false],
+      [false, [true], false],
+    ])('correctly checks if a value is in set', (
+      value,
+      array,
+      result,
+    ) => {
+      expect(INCLUDES(value, array)).toBe(result);
     });
 
-    test('should handle empty set', () => {
-      expect(INCLUDES(2, [])).toBe(false);
+    test.each([
+      [1, [], false],
+      [1, undefined, false],
+      [1, null, false],
+    ])('handles empty/nullish set', (
+      value, array, result
+    ) => {
+      expect(INCLUDES(value, array as unknown)).toBe(result);
     });
 
-    test('should handle edge cases', () => {
-      expect(INCLUDES(undefined, [undefined])).toBe(true);
-      expect(INCLUDES(null, [null])).toBe(true);
-      expect(INCLUDES(undefined, [null])).toBe(false);
-      expect(INCLUDES(null, [undefined])).toBe(false);
+    test.each([
+      [undefined, [undefined], true],
+      [null, [null], true],
+      [undefined, [null], false],
+      [null, [undefined], false],
+      [{ a: 1 }, [{ a: 1 }], false],
+    ])('handles edge cases', (
+      value,
+      array,
+      result,
+    ) => {
+      expect(INCLUDES(value, array as unknown[])).toBe(result);
+    });
+
+    test.each([
+      ['1', '1', true],
+      ['1', '123', true],
+      ['1', '23', false],
+    ])('handles non array values', (
+      value,
+      nonArray,
+      result,
+    ) => {
+      expect(INCLUDES(value, nonArray as unknown as unknown[])).toBe(result);
+    });
+
+    test.each([
+      [1, {}],
+      [1, 0],
+      [1, 10],
+      [1, NaN],
+      [1, Infinity],
+      [1, Function],
+    ])('throws an error for non array ish values', (
+      value,
+      array,
+    ) => {
+      expect(() => INCLUDES(value, array as unknown as unknown[]))
+        .toThrowError(new JexlFunctionExecutionError('Second argument is invalid.'));
     });
   });
 

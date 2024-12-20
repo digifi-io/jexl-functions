@@ -21,7 +21,7 @@ const WEEKEND_MASK_BY_NUMBER: Record<number, string> = {
   17: '0000010',
 };
 
-export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStringWithValidation }, options) => {
+export default createModule(({ validateArrayLikeValueMaxSize, coerceToNumber, coerceToStringWithValidation }, options) => {
   const shortUnitTypeToLongUnitType: Record<string, UnitType> = {
     'M': 'months',
     'D': 'days',
@@ -201,7 +201,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     const transformedHolidays = Array.isArray(holidays) ? holidays : [holidays];
     const weekendMask = getWeekendMask(weekend);
 
-    validateArrayMaxSize(holidays);
+    validateArrayLikeValueMaxSize(holidays);
     validateWeekendMask(weekendMask);
 
     if (!startDateObject.isValid()) {
@@ -260,7 +260,7 @@ export default createModule(({ validateArrayMaxSize, coerceToNumber, coerceToStr
     }
 
     validateWeekendMask(weekendMask);
-    validateArrayMaxSize(holidays);
+    validateArrayLikeValueMaxSize(holidays);
 
     const holidaysSet = generateHolidaysSet(transformedHolidays);
     const typedWeekendMask = weekendMask as string;

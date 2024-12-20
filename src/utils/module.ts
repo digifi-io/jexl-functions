@@ -1,15 +1,15 @@
 import {
   createValidateTextLengthFunction,
-  createValidateArrayMaxSizeFunction,
+  createValidateArrayLikeValueMaxSizeFunction,
   createValidateCriteria,
 } from './validation';
 import { createSaveFlattenFunction } from './array';
 import { evalCriteriaParseResult, parseCriteriaExpression } from './criteria';
-import { coerceToString, coerceToNumber, coerceNullableArrayToArray } from './coerceUtils';
+import { coerceToString, coerceToNumber, coerceNullishValueToArray } from './coerceUtils';
 
 export interface ModuleUtils {
   validateTextLength: ReturnType<typeof createValidateTextLengthFunction>;
-  validateArrayMaxSize: ReturnType<typeof createValidateArrayMaxSizeFunction>;
+  validateArrayLikeValueMaxSize: ReturnType<typeof createValidateArrayLikeValueMaxSizeFunction>;
   safeFlatten: ReturnType<typeof createSaveFlattenFunction>;
   validateCriteria: ReturnType<typeof createValidateCriteria>;
   evalCriteriaParseResult: typeof evalCriteriaParseResult;
@@ -17,7 +17,7 @@ export interface ModuleUtils {
   coerceToNumber: typeof coerceToNumber;
   coerceToString: typeof coerceToString;
   coerceToStringWithValidation: (text: unknown, maxTextLengthOverride?: number) => string;
-  coerceToArray: typeof coerceNullableArrayToArray;
+  coerceNullishValueToArray: typeof coerceNullishValueToArray;
 }
 
 export interface IBaseCreateModuleOptions {
@@ -53,7 +53,7 @@ export function createModule<ReturnType>(
     };
 
     const validateTextLength = createValidateTextLengthFunction(currentOptions.defaultMaxTextLength);
-    const validateArrayMaxSize = createValidateArrayMaxSizeFunction(currentOptions.defaultMaxArraySize);
+    const validateArrayLikeValueMaxSize = createValidateArrayLikeValueMaxSizeFunction(currentOptions.defaultMaxArraySize);
     const safeFlatten = createSaveFlattenFunction(currentOptions.defaultMaxArraySize);
     const validateCriteria = createValidateCriteria(currentOptions.defaultMaxCriteriaLength);
 
@@ -67,7 +67,7 @@ export function createModule<ReturnType>(
 
     return callback({
       validateTextLength,
-      validateArrayMaxSize,
+      validateArrayLikeValueMaxSize,
       safeFlatten,
       validateCriteria,
       coerceToStringWithValidation,
@@ -75,7 +75,7 @@ export function createModule<ReturnType>(
       parseCriteriaExpression,
       coerceToNumber,
       coerceToString,
-      coerceToArray: coerceNullableArrayToArray,
+      coerceNullishValueToArray,
     }, currentOptions);
   };
 }

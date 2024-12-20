@@ -2,12 +2,16 @@ import { JexlFunctionExecutionError } from '../errors';
 import { NotEmptyValue } from '../../types';
 import { createModule } from '../utils/module';
 import createInformationModule from './information';
+import { isArrayLike } from 'lodash';
 
-export default createModule(({ validateArrayMaxSize }, options) => {
+export default createModule(({
+  validateArrayLikeValueMaxSize,
+  coerceNullishValueToArray,
+}, options) => {
   const { ISDATESTRING, ISEMPTY } = createInformationModule();
 
   const AND = (...args: unknown[]) => {
-    validateArrayMaxSize(args);
+    validateArrayLikeValueMaxSize(args);
 
     // Filter args to keep previous functions working
     const filteredArgs = args.filter((arg) => {
@@ -18,7 +22,7 @@ export default createModule(({ validateArrayMaxSize }, options) => {
   };
 
   const OR = (...args: unknown[]) => {
-    validateArrayMaxSize(args);
+    validateArrayLikeValueMaxSize(args);
 
     // Filter args to keep previous functions working
     const filteredArgs = args.filter((arg) => {
@@ -29,7 +33,7 @@ export default createModule(({ validateArrayMaxSize }, options) => {
   };
 
   const XOR = (...args: unknown[]) => {
-    validateArrayMaxSize(args);
+    validateArrayLikeValueMaxSize(args);
 
     const passedCount = args.reduce((previousPassedCount: number, arg) => {
       return arg ? previousPassedCount + 1 : previousPassedCount;
@@ -61,7 +65,7 @@ export default createModule(({ validateArrayMaxSize }, options) => {
   };
 
   const IFS = (...args: unknown[]) => {
-    validateArrayMaxSize(args, options.defaultMaxArraySize * 2);
+    validateArrayLikeValueMaxSize(args, options.defaultMaxArraySize * 2);
 
     for (let i = 0; i < args.length / 2; i++) {
       if (args[i * 2]) {
@@ -81,7 +85,7 @@ export default createModule(({ validateArrayMaxSize }, options) => {
   };
 
   const SWITCH = (value: unknown, ...args: unknown[]) => {
-    validateArrayMaxSize(args, options.defaultMaxArraySize * 2);
+    validateArrayLikeValueMaxSize(args, options.defaultMaxArraySize * 2);
 
     const switchCount = Math.floor(args.length / 2);
     const defaultCase = args.length % 2 === 0 ? null : args[args.length - 1];
@@ -223,10 +227,16 @@ export default createModule(({ validateArrayMaxSize }, options) => {
     return value === compareTo;
   };
 
-  const INCLUDES = (value: unknown, includesSet: unknown[]) => {
-    validateArrayMaxSize(includesSet);
+  const INCLUDES = (value: unknown, includesSet: unknown | null | undefined) => {
+    const includesSetArray = coerceNullishValueToArray(includesSet);
 
-    return includesSet.includes(value);
+    if (!isArrayLike(includesSetArray)) {
+      throw new JexlFunctionExecutionError('Second argument is invalid.');
+    }
+
+    validateArrayLikeValueMaxSize(includesSetArray);
+
+    return (includesSetArray as unknown[]).includes(value);
   };
 
   const NOTEQUAL = (value: unknown, compareTo: unknown) => {
@@ -234,8 +244,6 @@ export default createModule(({ validateArrayMaxSize }, options) => {
   };
 
   const NINCLUDES = (value: unknown, notIncludesSet: unknown[]) => {
-    validateArrayMaxSize(notIncludesSet);
-
     return !INCLUDES(value, notIncludesSet);
   };
 

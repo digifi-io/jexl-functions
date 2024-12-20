@@ -1,9 +1,9 @@
 import { uniq } from 'lodash';
 import { createModule } from '../utils/module';
 
-export default createModule(({ validateArrayMaxSize }) => {
+export default createModule(({ validateArrayLikeValueMaxSize }) => {
   const UNIQUE = (source: unknown[]) => {
-    validateArrayMaxSize(source);
+    validateArrayLikeValueMaxSize(source);
 
     return uniq(source);
   };

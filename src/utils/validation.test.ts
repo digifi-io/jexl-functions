@@ -1,5 +1,5 @@
 import {
-  createValidateArrayMaxSizeFunction,
+  createValidateArrayLikeValueMaxSizeFunction,
   createValidateCriteria,
   createValidateTextLengthFunction,
 } from './validation';
@@ -10,7 +10,7 @@ describe('Validation', () => {
 
   describe('createValidateArrayMaxSizeFunction function', () => {
     const defaultMaxSize = 10;
-    const validateArrayMaxSizeFunction = createValidateArrayMaxSizeFunction(defaultMaxSize);
+    const validateArrayMaxSizeFunction = createValidateArrayLikeValueMaxSizeFunction(defaultMaxSize);
 
     test('should not throw error when array length is within defaultMaxSize', () => {
       expect(() => validateArrayMaxSizeFunction(mockArray)).not.toThrow();
@@ -30,7 +30,7 @@ describe('Validation', () => {
 
     test('should use maxSizeOverride if provided', () => {
       const maxSizeOverride = 2;
-      const validateArrayMaxSizeFunctionWithOverride = createValidateArrayMaxSizeFunction(defaultMaxSize);
+      const validateArrayMaxSizeFunctionWithOverride = createValidateArrayLikeValueMaxSizeFunction(defaultMaxSize);
       expect(() => validateArrayMaxSizeFunctionWithOverride(mockArray, maxSizeOverride)).toThrow(
         new JexlFunctionExecutionError(`Items size exceeded. Provided ${mockArray.length}, maximum ${maxSizeOverride}`)
       );
