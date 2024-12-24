@@ -1,6 +1,6 @@
 {
   "name": "@digifi/jexl-functions",
-  "version": "2.2.13",
+  "version": "2.2.14-alpha",
   "description": "Package with available JEXL functions",
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
