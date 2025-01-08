@@ -1,5 +1,5 @@
 import { createModule } from '../utils/module';
-import { JexlFunctionExecutionError } from "../errors";
+import { JexlFunctionExecutionError } from '../errors';
 
 export default createModule(({ coerceToNumber, validateTextLength }) => {
   const MONETARY_FORMAT_MAX_CURRENCY_SYMBOL_LENGTH = 5;

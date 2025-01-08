@@ -1,8 +1,8 @@
 import { JexlFunctionExecutionError } from '../errors';
-import { createValidateArrayMaxSizeFunction } from './validation';
+import { createValidateArrayLikeValueMaxSizeFunction } from './validation';
 
 export const createSaveFlattenFunction = (maxFlattenArraySize: number) => {
-  const validateArrayMaxSize = createValidateArrayMaxSizeFunction(maxFlattenArraySize);
+  const validateArrayMaxSize = createValidateArrayLikeValueMaxSizeFunction(maxFlattenArraySize);
 
   return (args: unknown[]) => {
     validateArrayMaxSize(args);

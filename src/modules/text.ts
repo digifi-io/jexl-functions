@@ -1,7 +1,12 @@
 import { JexlFunctionExecutionError } from '../errors';
 import { createModule } from '../utils/module';
 
-export default createModule(({ coerceToStringWithValidation, validateTextLength, coerceToNumber, validateArrayMaxSize }) => {
+export default createModule(({
+  coerceToStringWithValidation,
+  validateTextLength,
+  coerceToNumber,
+  validateArrayLikeValueMaxSize,
+}) => {
   const SUBSTITUTE = (text: unknown, textToReplace: unknown, replacement: unknown) => {
     if (typeof text !== 'string') {
       throw new JexlFunctionExecutionError('Text argument should be a string.');
@@ -45,7 +50,7 @@ export default createModule(({ coerceToStringWithValidation, validateTextLength,
   };
 
   const CONCAT = (...args: unknown[]) => {
-    validateArrayMaxSize(args);
+    validateArrayLikeValueMaxSize(args);
 
     return args.join('');
   };

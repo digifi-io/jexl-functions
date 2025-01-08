@@ -18,10 +18,10 @@ export const coerceToNumber = (value: unknown) => {
   return Number(value);
 };
 
-export const coerceNullableArrayToArray = (value: [] | null | undefined) => {
+export const coerceNullishValueToArray = (value: unknown | null | undefined) => {
   if (value === null || value === undefined) {
     return [];
   }
 
-  return value as [];
+  return value;
 };
