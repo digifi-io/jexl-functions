@@ -2,6 +2,7 @@
 import { NotEmptyValue } from '../../types';
 
 const CRITERIA_OPERATORS = ['>=', '<=', '<>', '=', '>', '<'];
+const CRITERIA_OPERATORS_WITH_NULLISH_VALUE_CHECK = ['<>'];
 export const CRITERIA_OPERATORS_SET = new Set(CRITERIA_OPERATORS);
 const DEFAULT_OPERATION = '=';
 const SPLIT_REGEX = new RegExp(`^(${CRITERIA_OPERATORS.join('|')})`);
@@ -13,6 +14,7 @@ export interface IOperationParseResult {
   operator: string;
   rightOperand: unknown;
   disableCoercing?: boolean;
+  nullishValuesComparable?: boolean;
 }
 
 export interface ISystemCriteriaParseResult {
@@ -43,6 +45,7 @@ export const parseCriteriaExpression = (criteria: ICriteria): ICriteriaParseResu
       operator,
       rightOperand,
       disableCoercing: true,
+      nullishValuesComparable: CRITERIA_OPERATORS_WITH_NULLISH_VALUE_CHECK.includes(operator),
     };
   }
 
@@ -63,11 +66,12 @@ export const parseCriteriaExpression = (criteria: ICriteria): ICriteriaParseResu
   return {
     operator: isOperationExists ? operation : DEFAULT_OPERATION,
     rightOperand: isOperationExists ? operand.trimStart() : criteria.trimStart(),
+    nullishValuesComparable: CRITERIA_OPERATORS_WITH_NULLISH_VALUE_CHECK.includes(operation),
   };
 };
 
 const evalOperationParseResult = (parseResult: IOperationParseResult, leftOperand: unknown) => {
-  if (leftOperand === null || leftOperand === undefined) {
+  if (!parseResult.nullishValuesComparable && (leftOperand === null || leftOperand === undefined)) {
     return false;
   }
 

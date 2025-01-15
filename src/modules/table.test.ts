@@ -865,8 +865,8 @@ describe('Table Module', () => {
     });
 
     test('should return an empty array when no rows match the criteria', () => {
-      // No rows match the criteria 'C'
-      expect(TABLEFILTERROWSIF(table, 'category', 'C')).toEqual([]);
+      // No rows match the criteria 'Z'
+      expect(TABLEFILTERROWSIF(table, 'category', 'Z')).toEqual([]);
     });
 
     test('should handle empty table', () => {
@@ -875,6 +875,44 @@ describe('Table Module', () => {
 
     test('should handle non-existent column', () => {
       expect(TABLEFILTERROWSIF(table, 'nonexistent', 'A')).toEqual([]);
+    });
+
+    test('filters rows by boolean value - not true', () => {
+      const table = [
+        { id: 5, category: 'A', value: 50 },
+        { id: 5, category: 'A', value: 0 },
+        { id: 1, category: 'C', value: true },
+        { id: 2, category: 'B', value: false },
+        { id: 2, category: 'B', value: null },
+        { id: 2, category: 'B', value: undefined },
+      ];
+
+      expect(TABLEFILTERROWSIF(table, 'value', ['<>', true])).toEqual([
+        { id: 5, category: 'A', value: 50 },
+        { id: 5, category: 'A', value: 0 },
+        { id: 2, category: 'B', value: false },
+        { id: 2, category: 'B', value: null },
+        { id: 2, category: 'B', value: undefined },
+      ]);
+    });
+
+    test('filters rows by boolean value - not false', () => {
+      const table = [
+        { id: 5, category: 'A', value: 50 },
+        { id: 5, category: 'A', value: 0 },
+        { id: 1, category: 'C', value: true },
+        { id: 2, category: 'B', value: false },
+        { id: 2, category: 'B', value: null },
+        { id: 2, category: 'B', value: undefined },
+      ];
+
+      expect(TABLEFILTERROWSIF(table, 'value', ['<>', false])).toEqual([
+        { id: 5, category: 'A', value: 50 },
+        { id: 5, category: 'A', value: 0 },
+        { id: 1, category: 'C', value: true },
+        { id: 2, category: 'B', value: null },
+        { id: 2, category: 'B', value: undefined },
+      ]);
     });
   });
 
