@@ -40,11 +40,11 @@ export default createModule(({ coerceToNumber, validateTextLength }) => {
       return value;
     }
 
-    let formattedValue = coercedValue.toFixed(fractionDigits);
-
-    if (useGrouping) {
-      formattedValue = formattedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    }
+    let formattedValue = coercedValue.toLocaleString('en-US', {
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+      useGrouping,
+    });
 
     if (currencyPosition === 'left') {
       formattedValue = `${currencySymbol}${formattedValue}`;
