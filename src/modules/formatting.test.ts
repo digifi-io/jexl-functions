@@ -26,6 +26,9 @@ describe('Formatting module', () => {
       expect(MONETARYFORMAT(11234.567, 1)).toStrictEqual('$11,234.6');
       expect(MONETARYFORMAT(11234.567, 2)).toStrictEqual('$11,234.57');
       expect(MONETARYFORMAT(11234.567, 3)).toStrictEqual('$11,234.567');
+      expect(MONETARYFORMAT(11234.555, 2)).toStrictEqual('$11,234.56');
+      expect(MONETARYFORMAT(11234.556, 2)).toStrictEqual('$11,234.56');
+      expect(MONETARYFORMAT(11234.554, 2)).toStrictEqual('$11,234.55');
     });
 
     test('should throw an error if fraction digits is not a number', () => {
