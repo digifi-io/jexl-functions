@@ -247,6 +247,11 @@ export default createModule(({ validateArrayLikeValueMaxSize, coerceToNumber, co
 
   const WORKDAYINTL = (startDate: unknown, days: unknown, weekend?: unknown, holidays: unknown[] = []) => {
     const startDateObject = dayjs(startDate as ConfigType);
+
+    if (!startDateObject.isValid()) {
+      throw new JexlFunctionExecutionError('Date is invalid');
+    }
+
     const coercedDays = coerceToNumber(days);
     const transformedHolidays = Array.isArray(holidays) ? holidays : [holidays];
     const weekendMask = getWeekendMask(weekend);

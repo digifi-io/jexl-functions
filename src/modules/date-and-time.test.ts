@@ -528,6 +528,13 @@ describe('Date And Time Module', () => {
       // Expected result: December 27, 2024 (Friday) since Christmas holidays will be skipped
       expect(dayjs(result).format('YYYY-MM-DD')).toEqual('2024-12-31');
     });
+
+    test('should return the correct error for an null start date', () => {
+      const startDate = null;
+      const days = 5;
+
+      expect(() => WORKDAYINTL(startDate, days)).toThrowError('Date is invalid');
+    });
   });
 
   describe('EDATE function', () => {
