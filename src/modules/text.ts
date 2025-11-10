@@ -12,17 +12,32 @@ export default createModule(({
       throw new JexlFunctionExecutionError('Text argument should be a string.');
     }
 
-    if (typeof textToReplace !== 'string') {
-      throw new JexlFunctionExecutionError('Text to replace argument should be a string.');
-    }
-
     if (typeof replacement !== 'string') {
       throw new JexlFunctionExecutionError('Replacement should be a string.');
     }
 
+    const isTextToReplaceArray = Array.isArray(textToReplace);
+
+    if (typeof textToReplace !== 'string' && !isTextToReplaceArray) {
+      throw new JexlFunctionExecutionError('Text to replace argument should be either a string or an array.');
+    }
+
+    if (isTextToReplaceArray && !textToReplace.every((item) => typeof item === 'string')) {
+      throw new JexlFunctionExecutionError('All items in text to replace array argument should be strings.');
+    }
+
     validateTextLength(text);
-    validateTextLength(textToReplace);
     validateTextLength(replacement);
+
+    if (isTextToReplaceArray) {
+      validateArrayLikeValueMaxSize(textToReplace);
+
+      return (textToReplace as string[]).reduce((accumulator, item) => {
+        return accumulator.replaceAll(item, replacement);
+      }, text as string);
+    }
+
+    validateTextLength(textToReplace);
 
     return text.replaceAll(textToReplace, replacement);
   };
