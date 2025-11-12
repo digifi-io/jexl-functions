@@ -1,6 +1,6 @@
 import { createModule } from '../utils/module';
 import { v4 as uuid } from 'uuid';
-import crypto from 'crypto';
+import { sha256 } from 'js-sha256';
 
 export default createModule(() => {
   const UUID = () => {
@@ -8,10 +8,9 @@ export default createModule(() => {
   };
 
   const HASH = (text: string) => {
-    return crypto
-      .createHash('sha256')
+    return sha256.create()
       .update(text)
-      .digest('hex');
+      .hex();
   };
 
   return {
