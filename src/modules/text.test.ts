@@ -81,6 +81,45 @@ describe('Text Module', () => {
 
       expect(result).toBe('heillo wo$rld hel%lo');
     });
+
+    test('should check that every item in text to replace argument is a string', () => {
+      const text = 'hello hi world hello';
+      const textToReplace = [123, 567];
+      const replacement = 'greetings';
+
+      expect(() => SUBSTITUTE(text, textToReplace, replacement))
+        .toThrow('All items in text to replace array argument should be strings.');
+    });
+
+    test('should handle array as text to replace', () => {
+      const text = 'hello hi world hello';
+      const textToReplace = ['hello', 'hi'];
+      const replacement = 'greetings';
+
+      const result = SUBSTITUTE(text, textToReplace, replacement);
+
+      expect(result).toBe('greetings greetings world greetings');
+    });
+
+    test('should handle empty array as text to replace', () => {
+      const text = 'hello hi world hello';
+      const textToReplace = [] as string[];
+      const replacement = 'greetings';
+
+      const result = SUBSTITUTE(text, textToReplace, replacement);
+
+      expect(result).toBe('hello hi world hello');
+    });
+
+    test('should handle overlapping replacements in text to replace array', () => {
+      const text = 'hello hi world hello';
+      const textToReplace = ['hel', 'hello'] as string[];
+      const replacement = 'greetings';
+
+      const result = SUBSTITUTE(text, textToReplace, replacement);
+
+      expect(result).toBe('greetingslo hi world greetingslo');
+    });
   });
 
   describe('REPLACE function', () => {
