@@ -1,5 +1,6 @@
 import { JexlFunctionExecutionError } from '../errors';
 import { createModule } from '../utils/module';
+import { escapeString } from '../utils/string.utils';
 
 export default createModule(({
   coerceToStringWithValidation,
@@ -29,17 +30,23 @@ export default createModule(({
     validateTextLength(text);
     validateTextLength(replacement);
 
+    const escapedText = escapeString(text);
+
     if (isTextToReplaceArray) {
       validateArrayLikeValueMaxSize(textToReplace);
 
       return (textToReplace as string[]).reduce((accumulator, item) => {
-        return accumulator.replaceAll(item, replacement);
-      }, text as string);
+        const escapedItem = escapeString(item);
+
+        return accumulator.replaceAll(escapedItem, replacement);
+      }, escapedText as string);
     }
 
     validateTextLength(textToReplace);
 
-    return text.replaceAll(textToReplace, replacement);
+    const escapedTextToReplace = escapeString(textToReplace);
+
+    return escapedText.replaceAll(escapedTextToReplace, replacement);
   };
 
   const REPLACE = (text: unknown, position: number, length: unknown, replacement: unknown) => {
