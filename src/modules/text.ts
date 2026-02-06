@@ -1,5 +1,6 @@
 import { JexlFunctionExecutionError } from '../errors';
 import { createModule } from '../utils/module';
+import { escapeString } from '../utils/string.utils';
 
 export default createModule(({
   coerceToStringWithValidation,
@@ -134,6 +135,10 @@ export default createModule(({
     return coerceToNumber(coerceToStringWithValidation(text));
   };
 
+  const ESCAPE = (text: unknown) => {
+    return escapeString(coerceToStringWithValidation(text));
+  };
+
   return {
     CLEAN,
     CONCAT,
@@ -153,5 +158,6 @@ export default createModule(({
     REPLACE,
     SUBSTITUTE,
     CONCATENATE: CONCAT,
+    ESCAPE,
   };
 });
