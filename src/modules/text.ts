@@ -30,23 +30,17 @@ export default createModule(({
     validateTextLength(text);
     validateTextLength(replacement);
 
-    const escapedText = escapeString(text);
-
     if (isTextToReplaceArray) {
       validateArrayLikeValueMaxSize(textToReplace);
 
       return (textToReplace as string[]).reduce((accumulator, item) => {
-        const escapedItem = escapeString(item);
-
-        return accumulator.replaceAll(escapedItem, replacement);
-      }, escapedText as string);
+        return accumulator.replaceAll(item, replacement);
+      }, text as string);
     }
 
     validateTextLength(textToReplace);
 
-    const escapedTextToReplace = escapeString(textToReplace);
-
-    return escapedText.replaceAll(escapedTextToReplace, replacement);
+    return text.replaceAll(textToReplace, replacement);
   };
 
   const REPLACE = (text: unknown, position: number, length: unknown, replacement: unknown) => {
@@ -141,6 +135,10 @@ export default createModule(({
     return coerceToNumber(coerceToStringWithValidation(text));
   };
 
+  const ESCAPE = (text: unknown) => {
+    return escapeString(coerceToStringWithValidation(text));
+  };
+
   return {
     CLEAN,
     CONCAT,
@@ -160,5 +158,6 @@ export default createModule(({
     REPLACE,
     SUBSTITUTE,
     CONCATENATE: CONCAT,
+    ESCAPE,
   };
 });
