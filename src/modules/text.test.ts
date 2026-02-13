@@ -20,6 +20,13 @@ const {
   SUBSTITUTE,
 } = TextModule();
 
+jest.mock('escape-string-regexp', () => {
+  return {
+    __esModule: true,
+    default: (str: string) => str,
+  };
+});
+
 describe('Text Module', () => {
   describe('SUBSTITUTE function', () => {
     test('should replace all occurrences of textToReplace with replacement', () => {
