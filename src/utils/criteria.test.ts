@@ -20,6 +20,54 @@ describe('Criteria', () => {
       expect(evalCriteriaParseResult(parseResult, leftOperand)).toBe(true);
     });
 
+    test('evaluates date comparison operation for array criteria options', () => {
+      const leftOperand = '2026-03-20';
+      const criteria: [string, string, { date_value: boolean; date_format: string; }] = ['>', '2026-03-19', {
+        date_value: true,
+        date_format: 'YYYY-MM-DD',
+      }];
+
+      const parseResult = parseCriteriaExpression(criteria);
+
+      expect(evalCriteriaParseResult(parseResult, leftOperand)).toBe(true);
+    });
+
+    test('returns false for invalid date comparison values with date options', () => {
+      const leftOperand = 'invalid-date';
+      const criteria: [string, string, { date_value: boolean; date_format: string; }] = ['=', '2026-03-19', {
+        date_value: true,
+        date_format: 'YYYY-MM-DD',
+      }];
+
+      const parseResult = parseCriteriaExpression(criteria);
+
+      expect(evalCriteriaParseResult(parseResult, leftOperand)).toBe(false);
+    });
+
+    test('keeps nullish values for date comparisons', () => {
+      const criteria: [string, string, { date_value: boolean; date_format: string; }] = ['<>', '2026-03-19', {
+        date_value: true,
+        date_format: 'YYYY-MM-DD',
+      }];
+
+      const parseResult = parseCriteriaExpression(criteria);
+
+      expect(evalCriteriaParseResult(parseResult, null)).toBe(true);
+      expect(evalCriteriaParseResult(parseResult, undefined)).toBe(true);
+    });
+
+    test('treats blank date values as null', () => {
+      const criteria: [string, string, { date_value: boolean; date_format: string; }] = ['=', '', {
+        date_value: true,
+        date_format: 'YYYY-MM-DD',
+      }];
+
+      const parseResult = parseCriteriaExpression(criteria);
+
+      expect(evalCriteriaParseResult(parseResult, '')).toBe(true);
+      expect(evalCriteriaParseResult(parseResult, null)).toBe(false);
+    });
+
     test('evaluates system criteria "#TRUE"', () => {
       const leftOperand = true;
       const criteria = '#TRUE';
@@ -86,8 +134,24 @@ describe('Criteria', () => {
       expect(parseCriteriaExpression(['>', 3])).toEqual({
         operator: '>',
         rightOperand: 3,
-        disableCoercing: true,
+        disableRightOperandToNumberCoercing: true,
         nullishValuesComparable: false,
+      });
+    });
+
+    test('correctly parse array criteria with date options', () => {
+      expect(parseCriteriaExpression(['>', '2026-03-19', {
+        date_value: true,
+        date_format: 'YYYY-MM-DD',
+      }])).toEqual({
+        operator: '>',
+        rightOperand: '2026-03-19',
+        disableRightOperandToNumberCoercing: true,
+        nullishValuesComparable: false,
+        criteriaOptions: {
+          date_value: true,
+          date_format: 'YYYY-MM-DD',
+        },
       });
     });
 
@@ -95,7 +159,7 @@ describe('Criteria', () => {
       expect(parseCriteriaExpression(['<>', false])).toEqual({
         operator: '<>',
         rightOperand: false,
-        disableCoercing: true,
+        disableRightOperandToNumberCoercing: true,
         nullishValuesComparable: true,
       });
     });

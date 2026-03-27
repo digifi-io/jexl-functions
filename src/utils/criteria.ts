@@ -1,5 +1,6 @@
 // The order of operators is important (first two-symbol operators, than 1 symbol).
 import { NotEmptyValue } from '../../types';
+import dayjs from '../dayjs';
 
 const CRITERIA_OPERATORS = ['>=', '<=', '<>', '=', '>', '<'];
 const CRITERIA_OPERATORS_WITH_NULLISH_VALUE_CHECK = ['<>'];
@@ -8,13 +9,19 @@ const DEFAULT_OPERATION = '=';
 const SPLIT_REGEX = new RegExp(`^(${CRITERIA_OPERATORS.join('|')})`);
 const SYSTEM_CRITERIA = ['#TRUE', '#FALSE', '#UNDEFINED', '#NULL', '#EMPTY', '#NOT_EMPTY', '#BLANK', '#NOT_BLANK'];
 
-export type ICriteria = string | [string, unknown];
+export interface ICriteriaOptions {
+  date_value?: boolean;
+  date_format?: string;
+}
+
+export type ICriteria = string | [string, unknown, ICriteriaOptions?];
 
 export interface IOperationParseResult {
   operator: string;
   rightOperand: unknown;
-  disableCoercing?: boolean;
+  disableRightOperandToNumberCoercing?: boolean;
   nullishValuesComparable?: boolean;
+  criteriaOptions?: ICriteriaOptions;
 }
 
 export interface ISystemCriteriaParseResult {
@@ -37,15 +44,44 @@ const coerceOperandToNumber = (operand: unknown) => {
   return Number.isNaN(coerced) ? operand : coerced;
 };
 
+const coerceDateOperandToComparable = (operand: unknown, format?: string) => {
+  if (operand === undefined || operand === null) {
+    return operand;
+  }
+
+  if (typeof operand === 'string' && operand.trim() === '') {
+    return null;
+  }
+
+  const dateObject = format && typeof operand === 'string'
+    ? dayjs(operand, format, true)
+    : dayjs(operand as Parameters<typeof dayjs>[0]);
+
+  return dateObject.isValid() ? dateObject.valueOf() : operand;
+};
+
+const coerceOperandForCompare = (
+  operand: unknown,
+  criteriaOptions?: ICriteriaOptions,
+  disableToNumberCoercing?: boolean,
+) => {
+  if (criteriaOptions?.date_value) {
+    return coerceDateOperandToComparable(operand, criteriaOptions.date_format);
+  }
+
+  return disableToNumberCoercing ? operand : coerceOperandToNumber(operand);
+};
+
 export const parseCriteriaExpression = (criteria: ICriteria): ICriteriaParseResult => {
   if (Array.isArray(criteria)) {
-    const [operator, rightOperand] = criteria;
+    const [operator, rightOperand, criteriaOptions] = criteria;
 
     return {
       operator,
       rightOperand,
-      disableCoercing: true,
+      disableRightOperandToNumberCoercing: true,
       nullishValuesComparable: CRITERIA_OPERATORS_WITH_NULLISH_VALUE_CHECK.includes(operator),
+      criteriaOptions,
     };
   }
 
@@ -75,33 +111,44 @@ const evalOperationParseResult = (parseResult: IOperationParseResult, leftOperan
     return false;
   }
 
-  const coercedRightOperand = (parseResult.disableCoercing || typeof leftOperand !== 'number'
-    ? parseResult.rightOperand
-    : coerceOperandToNumber(parseResult.rightOperand)) as NotEmptyValue;
+  const disableLeftOperandToNumberCoercing = true;
 
-  const typedLeftOperand = leftOperand as NotEmptyValue;
+  const coercedLeftOperand = coerceOperandForCompare(
+    leftOperand,
+    parseResult.criteriaOptions,
+    disableLeftOperandToNumberCoercing,
+  );
+
+  const coercedRightOperand = coerceOperandForCompare(
+    parseResult.rightOperand,
+    parseResult.criteriaOptions,
+    parseResult.disableRightOperandToNumberCoercing || typeof leftOperand !== 'number',
+  );
+
+  const typedLeftOperand = coercedLeftOperand as NotEmptyValue;
+  const typedRightOperand = coercedRightOperand as NotEmptyValue;
 
   switch (parseResult.operator) {
     case '>=': {
-      return typedLeftOperand >= coercedRightOperand;
+      return typedLeftOperand >= typedRightOperand;
     }
     case '<=': {
-      return typedLeftOperand <= coercedRightOperand;
+      return typedLeftOperand <= typedRightOperand;
     }
     case '<>': {
-      return leftOperand !== coercedRightOperand;
+      return typedLeftOperand !== typedRightOperand;
     }
     case '=': {
-      return leftOperand === coercedRightOperand;
+      return typedLeftOperand === typedRightOperand;
     }
     case '>': {
-      return typedLeftOperand > coercedRightOperand;
+      return typedLeftOperand > typedRightOperand;
     }
     case '<': {
-      return typedLeftOperand < coercedRightOperand;
+      return typedLeftOperand < typedRightOperand;
     }
     default: {
-      return leftOperand === coercedRightOperand;
+      return typedLeftOperand === typedRightOperand;
     }
   }
 };

@@ -24,7 +24,7 @@ export const createValidateTextLengthFunction = (defaultMaxTextLength: number) =
 };
 
 export const createValidateCriteria = (maxStringCriteriaLength: number) => {
-  const arrayCriteriaLength = 2;
+  const arrayCriteriaLength = 3;
 
   const validateStringCriteriaMaxLength = createValidateTextLengthFunction(maxStringCriteriaLength);
   const validateArrayCriteriaMaxLength = createValidateArrayLikeValueMaxSizeFunction(arrayCriteriaLength);
@@ -42,10 +42,28 @@ export const createValidateCriteria = (maxStringCriteriaLength: number) => {
 
     validateArrayCriteriaMaxLength(criteria);
 
-    const [operation] = criteria;
+    const [operation, , criteriaOptions] = criteria;
 
     if (!CRITERIA_OPERATORS_SET.has(operation)) {
       throw new JexlFunctionExecutionError('Criteria operation is invalid.');
+    }
+
+    if (criteriaOptions === undefined) {
+      return;
+    }
+
+    if (typeof criteriaOptions !== 'object' || criteriaOptions === null || Array.isArray(criteriaOptions)) {
+      throw new JexlFunctionExecutionError('Criteria options should be an object.');
+    }
+
+    const typedCriteriaOptions = criteriaOptions as { date_value?: unknown; date_format?: unknown; };
+
+    if (typedCriteriaOptions.date_value !== undefined && typeof typedCriteriaOptions.date_value !== 'boolean') {
+      throw new JexlFunctionExecutionError('Criteria option "date_value" should be a boolean.');
+    }
+
+    if (typedCriteriaOptions.date_format !== undefined && typeof typedCriteriaOptions.date_format !== 'string') {
+      throw new JexlFunctionExecutionError('Criteria option "date_format" should be a string.');
     }
   };
 };

@@ -95,10 +95,10 @@ describe('Validation', () => {
       );
     });
 
-    test('should throw error when criteria array length exceeds 2', () => {
-      const criteria = ['operation', 'value', 'extra']; // array length exceeds 2
+    test('should throw error when criteria array length exceeds 3', () => {
+      const criteria = ['operation', 'value', { date_value: true }, 'extra']; // array length exceeds 3
       expect(() => validateCriteriaFunction(criteria)).toThrow(
-        new JexlFunctionExecutionError(`Items size exceeded. Provided 3, maximum 2`)
+        new JexlFunctionExecutionError(`Items size exceeded. Provided 4, maximum 3`)
       );
     });
 
@@ -112,6 +112,32 @@ describe('Validation', () => {
     test('should not throw error when criteria array length is 2 and operations are valid', () => {
       const criteria = ['>', '<']; // valid operation
       expect(() => validateCriteriaFunction(criteria)).not.toThrow();
+    });
+
+    test('should not throw error when criteria options are valid', () => {
+      const criteria = ['>', '2026-03-19', { date_value: true, date_format: 'YYYY-MM-DD' }];
+      expect(() => validateCriteriaFunction(criteria)).not.toThrow();
+    });
+
+    test('should throw error when criteria options are invalid', () => {
+      const criteria = ['>', '2026-03-19', 'not-an-object'];
+      expect(() => validateCriteriaFunction(criteria)).toThrow(
+        new JexlFunctionExecutionError('Criteria options should be an object.')
+      );
+    });
+
+    test('should throw error when "date_value" option is not a boolean', () => {
+      const criteria = ['>', '2026-03-19', { date_value: 'true' }];
+      expect(() => validateCriteriaFunction(criteria)).toThrow(
+        new JexlFunctionExecutionError('Criteria option "date_value" should be a boolean.')
+      );
+    });
+
+    test('should throw error when "date_format" option is not a string', () => {
+      const criteria = ['>', '2026-03-19', { date_format: 20260319 }];
+      expect(() => validateCriteriaFunction(criteria)).toThrow(
+        new JexlFunctionExecutionError('Criteria option "date_format" should be a string.')
+      );
     });
   });
 });
