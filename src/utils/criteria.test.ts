@@ -68,6 +68,16 @@ describe('Criteria', () => {
       expect(evalCriteriaParseResult(parseResult, null)).toBe(false);
     });
 
+    test('returns true for nullish and blank values when optional criteria is enabled', () => {
+      const criteria: [string, number, { optional: boolean; }] = ['>', 3, { optional: true }];
+      const parseResult = parseCriteriaExpression(criteria);
+
+      expect(evalCriteriaParseResult(parseResult, null)).toBe(true);
+      expect(evalCriteriaParseResult(parseResult, undefined)).toBe(true);
+      expect(evalCriteriaParseResult(parseResult, '')).toBe(true);
+      expect(evalCriteriaParseResult(parseResult, '   ')).toBe(true);
+    });
+
     test('evaluates system criteria "#TRUE"', () => {
       const leftOperand = true;
       const criteria = '#TRUE';
@@ -151,6 +161,20 @@ describe('Criteria', () => {
         criteriaOptions: {
           date_value: true,
           date_format: 'YYYY-MM-DD',
+        },
+      });
+    });
+
+    test('correctly parse array criteria with optional option', () => {
+      expect(parseCriteriaExpression(['>', 3, {
+        optional: true,
+      }])).toEqual({
+        operator: '>',
+        rightOperand: 3,
+        disableRightOperandToNumberCoercing: true,
+        nullishValuesComparable: false,
+        criteriaOptions: {
+          optional: true,
         },
       });
     });

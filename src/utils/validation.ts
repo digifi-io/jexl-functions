@@ -56,7 +56,7 @@ export const createValidateCriteria = (maxStringCriteriaLength: number) => {
       throw new JexlFunctionExecutionError('Criteria options should be an object.');
     }
 
-    const typedCriteriaOptions = criteriaOptions as { date_value?: unknown; date_format?: unknown; };
+    const typedCriteriaOptions = criteriaOptions as { date_value?: unknown; date_format?: unknown; optional?: unknown; };
 
     if (typedCriteriaOptions.date_value !== undefined && typeof typedCriteriaOptions.date_value !== 'boolean') {
       throw new JexlFunctionExecutionError('Criteria option "date_value" should be a boolean.');
@@ -64,6 +64,10 @@ export const createValidateCriteria = (maxStringCriteriaLength: number) => {
 
     if (typedCriteriaOptions.date_format !== undefined && typeof typedCriteriaOptions.date_format !== 'string') {
       throw new JexlFunctionExecutionError('Criteria option "date_format" should be a string.');
+    }
+
+    if (typedCriteriaOptions.optional !== undefined && typeof typedCriteriaOptions.optional !== 'boolean') {
+      throw new JexlFunctionExecutionError('Criteria option "optional" should be a boolean.');
     }
   };
 };
