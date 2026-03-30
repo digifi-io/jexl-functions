@@ -139,5 +139,17 @@ describe('Validation', () => {
         new JexlFunctionExecutionError('Criteria option "date_format" should be a string.')
       );
     });
+
+    test('should not throw error when "optional" option is a boolean', () => {
+      const criteria = ['>', 5, { optional: true }];
+      expect(() => validateCriteriaFunction(criteria)).not.toThrow();
+    });
+
+    test('should throw error when "optional" option is not a boolean', () => {
+      const criteria = ['>', 5, { optional: 'true' }];
+      expect(() => validateCriteriaFunction(criteria)).toThrow(
+        new JexlFunctionExecutionError('Criteria option "optional" should be a boolean.')
+      );
+    });
   });
 });

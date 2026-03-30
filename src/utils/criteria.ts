@@ -12,6 +12,7 @@ const SYSTEM_CRITERIA = ['#TRUE', '#FALSE', '#UNDEFINED', '#NULL', '#EMPTY', '#N
 export interface ICriteriaOptions {
   date_value?: boolean;
   date_format?: string;
+  optional?: boolean;
 }
 
 export type ICriteria = string | [string, unknown, ICriteriaOptions?];
@@ -42,6 +43,14 @@ const coerceOperandToNumber = (operand: unknown) => {
   const coerced = Number(operand);
 
   return Number.isNaN(coerced) ? operand : coerced;
+};
+
+const isNullishOrEmptyString = (operand: unknown) => {
+  if (operand === null || operand === undefined) {
+    return true;
+  }
+
+  return typeof operand === 'string' && operand.trim() === '';
 };
 
 const coerceDateOperandToComparable = (operand: unknown, format?: string) => {
@@ -107,6 +116,10 @@ export const parseCriteriaExpression = (criteria: ICriteria): ICriteriaParseResu
 };
 
 const evalOperationParseResult = (parseResult: IOperationParseResult, leftOperand: unknown) => {
+  if (parseResult.criteriaOptions?.optional && isNullishOrEmptyString(leftOperand)) {
+    return true;
+  }
+
   if (!parseResult.nullishValuesComparable && (leftOperand === null || leftOperand === undefined)) {
     return false;
   }
@@ -153,7 +166,10 @@ const evalOperationParseResult = (parseResult: IOperationParseResult, leftOperan
   }
 };
 
-const evalSystemCriteriaParseResult = (parseResult: ISystemCriteriaParseResult, leftOperand: unknown) => {
+const evalSystemCriteriaParseResult = (
+  parseResult: ISystemCriteriaParseResult,
+  leftOperand: unknown,
+) => {
   switch (parseResult.systemCriteria) {
     case '#TRUE': {
       return leftOperand === true;
