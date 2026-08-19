@@ -1,5 +1,5 @@
 import { JexlFunctionExecutionError } from '../errors';
-import { ConfigType, UnitType } from 'dayjs';
+import { ConfigType, UnitType, ManipulateType } from 'dayjs';
 import dayjs from '../dayjs';
 import { createModule } from '../utils/module';
 
@@ -20,6 +20,7 @@ const WEEKEND_MASK_BY_NUMBER: Record<number, string> = {
   16: '0000100',
   17: '0000010',
 };
+const DATEADD_VALID_UNITS: ManipulateType[] = ['year', 'month', 'week', 'day', 'hour', 'minute', 'second'];
 
 export default createModule(({ validateArrayLikeValueMaxSize, coerceToNumber, coerceToStringWithValidation }, options) => {
   const shortUnitTypeToLongUnitType: Record<string, UnitType> = {
@@ -357,6 +358,45 @@ export default createModule(({ validateArrayLikeValueMaxSize, coerceToNumber, co
     );
   };
 
+  const DATEADD = (date: unknown, amount: unknown, unit: unknown, format?: unknown) => {
+    const coercedAmount = coerceToNumber(amount);
+    const coercedUnit = coerceToStringWithValidation(unit) as ManipulateType;
+    const coercedFormat = coerceToStringWithValidation(format) || undefined;
+
+    if (!DATEADD_VALID_UNITS.includes(coercedUnit)) {
+      throw new JexlFunctionExecutionError(
+        `Invalid unit "${coercedUnit}". Valid units are: ${DATEADD_VALID_UNITS.join(', ')}`,
+      );
+    }
+
+    const dateObject = dayjs(date as ConfigType);
+
+    if (!dateObject.isValid()) {
+      throw new JexlFunctionExecutionError('Date is invalid');
+    }
+
+    return dateObject.add(coercedAmount, coercedUnit).format(coercedFormat);
+  };
+
+  const DATETZ = (date: unknown, tz: unknown, format?: unknown) => {
+    const coercedTz = coerceToStringWithValidation(tz);
+    const coercedFormat = coerceToStringWithValidation(format) || undefined;
+
+    try {
+      Intl.DateTimeFormat(undefined, { timeZone: coercedTz });
+    } catch {
+      throw new JexlFunctionExecutionError(`Invalid timezone "${coercedTz}". Must be a valid IANA timezone.`);
+    }
+
+    const dateObject = dayjs(date as ConfigType);
+
+    if (!dateObject.isValid()) {
+      throw new JexlFunctionExecutionError('Date is invalid');
+    }
+
+    return dateObject.tz(coercedTz).format(coercedFormat);
+  };
+
   return {
     WEEKNUM,
     YEAR,
@@ -375,6 +415,8 @@ export default createModule(({ validateArrayLikeValueMaxSize, coerceToNumber, co
     EDATE,
     DAYS360,
     DATEDIF,
+    DATEADD,
+    DATETZ,
   };
 }, {
   maxDaysForWorkdaysFunctions: 3653,

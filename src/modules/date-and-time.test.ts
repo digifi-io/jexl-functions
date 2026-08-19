@@ -19,6 +19,8 @@ const {
   EDATE,
   DAYS360,
   DATEDIF,
+  DATETZ,
+  DATEADD,
 } = DateAndTimeModule();
 
 describe('Date And Time Module', () => {
@@ -606,5 +608,93 @@ describe('Date And Time Module', () => {
       expect(result).toEqual(14);
     });
   });
-});
 
+  describe('DATEADD function', () => {
+    test('should add days to a date', () => {
+      const result = DATEADD('2024-03-01', 10, 'day', 'YYYY-MM-DD');
+      expect(result).toEqual('2024-03-11');
+    });
+
+    test('should add months to a date', () => {
+      const result = DATEADD('2024-01-31', 1, 'month', 'YYYY-MM-DD');
+      expect(result).toEqual('2024-02-29');
+    });
+
+    test('should add years to a date', () => {
+      const result = DATEADD('2024-03-01', 2, 'year', 'YYYY-MM-DD');
+      expect(result).toEqual('2026-03-01');
+    });
+
+    test('should add hours to a date', () => {
+      const result = DATEADD('2024-03-01T10:00:00', 5, 'hour', 'YYYY-MM-DD HH:mm:ss');
+      expect(result).toEqual('2024-03-01 15:00:00');
+    });
+
+    test('should add minutes to a date', () => {
+      const result = DATEADD('2024-03-01T10:00:00', 90, 'minute', 'YYYY-MM-DD HH:mm:ss');
+      expect(result).toEqual('2024-03-01 11:30:00');
+    });
+
+    test('should add seconds to a date', () => {
+      const result = DATEADD('2024-03-01T10:00:00', 30, 'second', 'YYYY-MM-DD HH:mm:ss');
+      expect(result).toEqual('2024-03-01 10:00:30');
+    });
+
+    test('should add weeks to a date', () => {
+      const result = DATEADD('2024-03-01', 2, 'week', 'YYYY-MM-DD');
+      expect(result).toEqual('2024-03-15');
+    });
+
+    test('should subtract days when amount is negative', () => {
+      const result = DATEADD('2024-03-15', -5, 'day', 'YYYY-MM-DD');
+      expect(result).toEqual('2024-03-10');
+    });
+
+    test('should return result in default format when format is not provided', () => {
+      const result = DATEADD('2024-03-01', 1, 'day');
+      expect(result).toEqual(dayjs('2024-03-02').format());
+    });
+
+    test('should throw an error for an invalid unit', () => {
+      expect(() => DATEADD('2024-03-01', 1, 'quarter')).toThrowError(
+        'Invalid unit "quarter". Valid units are: year, month, week, day, hour, minute, second',
+      );
+    });
+
+    test('should throw an error for an invalid date', () => {
+      expect(() => DATEADD('invalid-date', 1, 'day')).toThrowError('Date is invalid');
+    });
+  });
+
+  describe('DATETZ function', () => {
+    test('should convert UTC date to the target timezone', () => {
+      const result = DATETZ('2024-03-01T12:00:00Z', 'America/New_York', 'YYYY-MM-DD HH:mm');
+      expect(result).toEqual('2024-03-01 07:00');
+    });
+
+    test('should convert UTC date to a positive offset timezone', () => {
+      const result = DATETZ('2024-03-01T12:00:00Z', 'Europe/Berlin', 'YYYY-MM-DD HH:mm');
+      expect(result).toEqual('2024-03-01 13:00');
+    });
+
+    test('should handle timezone with DST (summer time)', () => {
+      const result = DATETZ('2024-07-01T12:00:00Z', 'America/New_York', 'YYYY-MM-DD HH:mm');
+      expect(result).toEqual('2024-07-01 08:00');
+    });
+
+    test('should return result in default format when format is not provided', () => {
+      const result = DATETZ('2024-03-01T12:00:00Z', 'UTC');
+      expect(result).toContain('2024-03-01');
+    });
+
+    test('should throw an error for an invalid timezone', () => {
+      expect(() => DATETZ('2024-03-01T12:00:00Z', 'Invalid/Zone')).toThrowError(
+        'Invalid timezone "Invalid/Zone". Must be a valid IANA timezone.',
+      );
+    });
+
+    test('should throw an error for an invalid date', () => {
+      expect(() => DATETZ('invalid-date', 'UTC')).toThrowError('Date is invalid');
+    });
+  });
+});
