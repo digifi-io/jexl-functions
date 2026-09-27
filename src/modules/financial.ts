@@ -215,7 +215,7 @@ export default createModule(({ safeFlatten, coerceToNumber }, options) => {
   };
 
   const RATE = (periods: unknown, payment: unknown, present: unknown, future: unknown, type: unknown, guess: unknown) => {
-    const coercedGuess = guess === undefined ? 0.01 : coerceToNumber(guess);
+    const coercedGuess = guess === undefined ? 0.1 : coerceToNumber(guess);
     const coercedFuture = future ? coerceToNumber(future) : 0;
     const coercedType = type ? 1 : 0;
     const coercedPeriods = coerceToNumber(periods);
